@@ -1,0 +1,36 @@
+columns:
+    project_number:
+        label: 'Номер проекта'
+        type: text
+    nioktr_number:
+        label: 'Номер Цитис'
+        type: text
+    competition:
+        label: 'Конкурс'
+        type: text    
+    name:
+        label: Название
+        type: text
+        searchable: true
+    project_type:
+        label: 'Тип проекта'
+        type: number
+    start_year:
+        label: 'Год начала'
+        type: number
+    finish_year:
+        label: 'Год завершения'
+        type: number
+    # projecttype:
+    #     label: 'Тип проекта'
+    #     type: number
+    #     nameFrom: name
+    leader:
+        label: Руководитель
+        type: text
+    url:
+        label: URL
+        type: text
+
+
+

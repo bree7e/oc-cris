@@ -1,0 +1,34 @@
+{##}
+{% if publications %}
+    <h2 class="ui  header">Список публикаций</h2>
+    <ol class="ui list">
+    {% for p in publications %}
+        {% if p.language == 'russian' %}
+            {% set pages = '. — с.' %}
+            {% set volume = '. — Т.' %}
+        {% elseif p.language == 'english' %}
+            {% set pages = '. — pp.' %}
+            {% set volume = '. — Vol.' %}
+        {% endif %}
+        <li>
+            {% if p.publication_type_id == 1 or p.publication_type_id == 2 %}
+                <i>{{ p.authors }}</i> {{ p.title|trim }} // {{ p.journal|trim }}. {{ p.year|trim }}
+                {% if p.volume is not empty %}
+                    {{ volume ~ p.volume|trim }}
+                    {{ p.number ? ", №" ~ p.number|trim }}
+                {% elseif p.number is not empty %}
+                    . — №{{ p.number|trim }}
+                {% endif %}
+                {{ p.pages ? pages ~ p.pages|trim }}
+            {% elseif p.publication_type_id == 3 %}
+                <i>{{ p.authors }}</i> {{ p.title }} Свидетельство о государственной регистрации программ для ЭВМ №{{ p.number }} М.: Федеральная служба по интеллектуальной собственности, патентам и товарным знакам, {{ p.year }}.                
+            {% endif %}
+        </li>
+    {% endfor %}
+    <ol>
+{% else %}
+    <h2 class="ui  header">По вашему запросу не найдено публикаций!</h2>
+{% endif %}
+
+
+{# author.artRiscTotal ? author.artRiscTotal|number_format(2) #}

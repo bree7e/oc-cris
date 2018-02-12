@@ -1,0 +1,17 @@
+{##}
+<h4 class="ui header">Количество зарегистрированных авторов: {{ __SELF__.authorCount }}</h4>
+<h4 class="ui header">Количество проектов: {{ __SELF__.projectCount }}</h4>
+<h4 class="ui header">Количество публикаций: {{ __SELF__.publicationCount }}</h4>
+<p>Из них</p>
+<ul class="ui list">
+    <li>Журнальные статьи: {{ __SELF__.articleCount }}</li>
+    <ul class="ui list">
+        <li>WoS: {{ __SELF__.articleWosCount }}</li>
+        <li>Scopus: {{  __SELF__.articleScopusCount }}</li>
+        <li>РИНЦ: {{  __SELF__.articleRiscCount }}</li>
+    </ul>
+    <li>Труды конференций: {{ __SELF__.inproceedingsCount }}</li>
+    <li>Авторские свидетельства: {{ __SELF__.patentCount }}</li>
+</ul>
+
+

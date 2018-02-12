@@ -1,0 +1,180 @@
+fields:
+    publicationtype:
+        label: 'Тип публикации'
+        oc.commentPosition: ''
+        nameFrom: name
+        descriptionFrom: description
+        span: left
+        type: relation
+    authors_count:
+        label: 'Количество авторов нашего института'
+        span: auto
+        placeholder: ''
+        type: number
+        comment: 'Делением на это число получается коэффициент премирования'
+    sectionRequired:
+        label: 'Основная информация'
+        span: full
+        type: section
+    authors:
+        label: Авторы
+        oc.commentPosition: ''
+        span: full
+        placeholder: 'Иванов А.А., Петров С.Г., Сидоров Д.А.'
+        default: 'Иванов А.А., Петров С.Г., Сидоров Д.А.'
+        disabled: 0
+        required: 1
+        type: text
+    title:
+        label: Название
+        oc.commentPosition: ''
+        span: full
+        required: 1
+        default: 'Создание супер системы'
+        type: text
+    journal:
+        label: Журнал
+        comment: 'В случае трудов конференции - название сборника'
+        span: full
+        required: 1
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][2]'
+        type: text
+    year:
+        label: Год
+        oc.commentPosition: ''
+        span: left
+        placeholder: XXXX
+        type: number
+    month:
+        label: Месяц
+        oc.commentPosition: ''
+        span: right
+        placeholder: XX
+        type: text
+        hidden: 1
+    published_at:
+        label: 'Дата публикации'
+        oc.commentPosition: ''
+        mode: date
+        span: left
+        required: true
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[3]'
+        type: datepicker
+    sectionAdditional:
+        label: 'Дополнительная информация'
+        span: full
+        type: section
+    volume:
+        label: Том
+        oc.commentPosition: ''
+        span: left
+        type: text
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][2][4]'
+    number:
+        label: Номер
+        oc.commentPosition: ''
+        span: right
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][3]'
+        type: text
+    pages:
+        label: Страницы
+        oc.commentPosition: ''
+        span: left
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][2][4][5][6]'
+        type: text
+    address:
+        label: 'Место издания'
+        oc.commentPosition: ''
+        span: left
+        placeholder: 'Обычно название города'
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[2][3][4]'
+        type: text
+    publisher:
+        label: 'Название издательства'
+        oc.commentPosition: ''
+        span: right
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[2][3][4]'
+        type: text
+    edition:
+        label: Издание
+        comment: 'Например, 2-е исправленное'
+        span: left
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[4]'
+        type: text
+    type:
+        label: 'Тип материала'
+        oc.commentPosition: ''
+        options:
+            Текст: Текст
+            'Электронный ресурс': 'Электронный ресурс'
+            Карта: Карта
+        span: left
+        type: dropdown
+    is_to_print:
+        label: 'В печати'
+        span: left
+        type: checkbox
+    is_special:
+        label: 'Специальный выпуск'
+        span: left
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][2]'
+        type: checkbox
+    sectionIndex:
+        label: Индексация
+        span: full
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][2]'
+        type: section
+    is_wos:
+        label: 'Web of Science'
+        span: left
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][2]'
+        type: checkbox
+    is_scopus:
+        label: Scopus
+        span: left
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][2]'
+        type: checkbox
+    is_risc:
+        label: 'РИНЦ'
+        span: left
+        trigger:
+            action: show
+            field: publicationtype
+            condition: 'value[1][2]'
+        type: checkbox

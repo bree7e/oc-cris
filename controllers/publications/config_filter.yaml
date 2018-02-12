@@ -1,0 +1,55 @@
+# ===================================
+# Filter Scope Definitions
+# ===================================
+
+scopes:
+    types:
+        # Filter name
+        label: Тип публикации
+        # Model Class name
+        modelClass: Bree7e\Cris\Models\PublicationType
+        # Model attribute to display for the name
+        nameFrom: name
+        # Filter scope
+        scope: filterByType
+    year:
+        label: Год
+        type: number
+        conditions: year = ':filtered'
+    reportYear:
+        label: Отчётны год
+        type: number
+        conditions: reportYear = ':filtered'
+    language:
+        label: Язык
+        type: group
+        conditions: language in (:filtered)   
+        options:
+            russian: Русский
+            english: Английский
+    classification:
+        label: Классификация
+        modelClass: Bree7e\Cris\Models\Publication
+        type: group
+        conditions: classification in (:filtered)   
+        options: getClassificationOptions
+    journal:
+        label: Журнал (%)
+        type: text
+        conditions: journal like :value
+        size: 30
+    is_editable:
+        label: Редактируемые
+        type: checkbox
+        conditions: is_editable <> true    
+    authors:
+        label: Привязано к автору
+        modelClass: Bree7e\Cris\Models\Author
+        nameFrom: surname
+        scope: ofAuthors
+    addedbyauthor:
+        label: Добавлено автором
+        modelClass: Bree7e\Cris\Models\Author
+        nameFrom: surname
+        scope: addedByAuthors
+            

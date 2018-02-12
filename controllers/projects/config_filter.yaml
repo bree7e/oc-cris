@@ -1,0 +1,24 @@
+# ===================================
+# Filter Scope Definitions
+# ===================================
+
+scopes:
+    types:
+        label: Тип проекта
+        modelClass: Bree7e\Cris\Models\ProjectType
+        nameFrom: name
+        scope: ofType
+    start_year:
+        label: Год начала
+        type: number
+        conditions: start_year = ':filtered'
+    finish_year:
+        label: Год завершения
+        type: number
+        conditions: finish_year = ':filtered'
+    leader:
+        label: Руководитель
+        modelClass: Bree7e\Cris\Models\Author
+        nameFrom: surname
+        scope: ofLeaders
+            

@@ -1,0 +1,441 @@
+<?php namespace Bree7e\Cris\Models;
+
+use DB;
+use Model;
+use Bree7e\Cris\Models\Author;
+use Bree7e\Cris\Models\Department;
+use October\Rain\Database\Builder;
+use October\Rain\Database\Collection;
+use Bree7e\Cris\Models\AuthorAlternativeName as Synonym;
+
+/**
+ * Publication Model
+ */
+class Publication extends Model
+{
+    use \October\Rain\Database\Traits\Validation;
+
+    /**
+     * @var string The database table used by the model.
+     */
+    public $table = 'bree7e_cris_publications';
+
+    /**
+     * @var array Guarded fields
+     */
+    protected $guarded = [
+        'id',
+        'authors_count',
+        'added_by_rb_user_id'
+    ];
+
+    /**
+     * @var array Fillable fields
+     */
+    protected $fillable = [
+    ];
+
+    /**
+     * @var array Правила валидации для Traits\Validation
+     */
+    public $rules = [
+        'authors' => 'required',
+        'title' => 'required'
+        // publication_authors тоже надо будет добавить
+    ];
+
+    /**
+     * The array of custom error messages.
+     *
+     * @var array
+     */
+    public $customMessages = [
+        // 'required' => 'Поле :attribute обязательно',
+        'authors.required' => 'Необходимо обязательно заполнить поле "Авторы".',
+        'title.required' => 'Необходимо обязательно заполнить поле "Название публикации".'
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'published_at'
+    ];
+    
+    /**
+     * @var array Relations
+     */
+    public $hasOne = [];
+    public $hasMany = [];
+    public $belongsTo = [
+        'translated_version' => [
+            Publication::class, 
+            'key' => 'translated_id'
+        ],
+        'publicationtype' => [
+            PublicationType::class, 
+            'key' => 'publication_type_id'
+        ],
+        'addedByAuthor' => [
+            Author::class, 
+            'key' => 'added_by_rb_user_id'
+        ],
+    ];
+    public $belongsToMany = [
+        'projects' => [
+            'Bree7e\Cris\Models\Project',
+            'table' => 'bree7e_cris_projects_publications', // таблица многие-ко-многим
+            'order' => 'name'
+        ],
+        'publication_authors' => [
+            'Bree7e\Cris\Models\Author',
+            'table' => 'bree7e_cris_authors_publications', // таблица многие-ко-многим
+            'key' => 'publication_id', // The key parameter is the foreign key name of the model on which you are defining the relationship
+            'otherKey' => 'rb_author_id' // Second foreign key name in the many-to-many table
+        ]    
+    ];
+ 
+    public $morphTo = [];
+    public $morphOne = [];
+    public $morphMany = [];
+    public $attachOne = [];
+    public $attachMany = [];
+
+    /**
+     * Фильтрация публикаций по отчетному году
+     *
+     * @param Builder $query
+     * @param int $year
+     * @return \October\Rain\Database\Builder
+     */
+    public function scopeWhereReportYear(Builder $query, int $year): Builder
+    {
+        return $query->where('reportYear', $year);
+    }
+
+    /**
+     * Фильтрация публикаций по годам
+     *
+     * @param Builder $query
+     * @param array $years
+     * @return \October\Rain\Database\Builder
+     */
+    public function scopeWhereYears(Builder $query, array $years): Builder
+    {
+        return $query->whereIn('year', $years);
+    }
+
+    /**
+     * Фильтрация публикаций по годам
+     *
+     * @param Builder $query
+     * @param integer $firstyear первый год
+     * @param integer $lastyear последний год
+     * @return \October\Rain\Database\Builder
+     */
+    public function scopeBetweenYears(Builder $query, $firstyear = 1900, $lastyear = 2100): Builder
+    {
+        return $query->whereBetween('year', [$firstyear, $lastyear]);
+    }
+
+    /**
+     * Фильтрация публикаций без указания отчетного года
+     *
+     * @param Builder $query
+     * @return \October\Rain\Database\Builder
+     */
+    public function scopeNoReportYear(Builder $query): Builder
+    {
+        return $query->where('reportYear', NULL);
+    }
+
+    /**
+     * Фильтрация публикаций без указания года
+     *
+     * @param Builder $query
+     * @return \October\Rain\Database\Builder
+     */
+    public function scopeNoYear(Builder $query): Builder
+    {
+        return $query->where('year', NULL);
+    }
+
+    /**
+     * Фильтрация публикаций без привязанных авторов
+     *
+     * @param Builder $query
+     * @return \October\Rain\Database\Builder
+     */
+    public function scopeNoAuthors(Builder $query): Builder
+    {
+        return $query->has('publication_authors', '=', '0');
+    }
+
+    /**
+     * Вернуть 0 публикаций. Для случая проблем это экран по-умолчанию.
+     *
+     * @param Builder $query
+     * @return \October\Rain\Database\Builder
+     */
+    public function scopeNoPublication(Builder $query): Builder
+    {
+        return $query->where('id', '<', '0');
+    }
+
+    /**
+     * Фильтрация публикаций определенного подразделения
+     *
+     * @param Query $query
+     * @param [type] $departmentId
+     * @return \October\Rain\Database\Builder
+     */ 
+    public function scopeOfDepartment(Builder $query, $departmentId): Builder
+    {
+        $departments = Department::findOrFail($departmentId)
+            ->getAllChildrenAndSelf()
+            ->pluck('id')
+            ->toArray();
+
+        $authors = Author::ofDepartments($departments)->get();
+        // получить массив идентификатов авторов
+        // @see https://laravel.com/docs/5.5/collections#method-pluck
+        $authorIds = $authors->pluck('id')->toArray();
+
+        $query = $query->ofAuthors($authorIds);
+
+        return $query;
+    }
+
+    /**
+     * Фильтрация публикаций определенного проекта
+     *
+     * @param Query $query
+     * @param array $projectId - Индентификатор проекта
+     * @return \October\Rain\Database\Builder
+     */ 
+    public function scopeOfProject(Builder $query, $projectId): Builder
+    {
+        return $query->whereHas('projects', function($q) use ($projectId) {
+            $q->where('project_id', $projectId);
+        });
+    }
+
+    /**
+     * Фильтрация публикаций определенного автора/авторов
+     *
+     * @param Query $query
+     * @param array $authors - Массив индентификаторов
+     * @return \October\Rain\Database\Builder
+     */ 
+    public function scopeOfAuthors(Builder $query, $authorIds): Builder
+    {
+        // http://php.net/manual/ru/functions.anonymous.php
+        return $query->whereHas('publication_authors', function($q) use ($authorIds) {
+            $q->whereIn('rb_author_id', $authorIds);
+        });
+    }
+
+    /**
+     * Фильтрация публикаций добавленных определнным пользователем
+     *
+     * @param Query $query
+     * @param array $authors - Массив индентификаторов
+     * @return \October\Rain\Database\Builder
+     */ 
+    public function scopeAddedByAuthors(Builder $query, array $authors): Builder
+    {
+        return $query->whereIn('added_by_rb_user_id', $authors);
+    }
+
+    /**
+     * Фильтрация публикаций по типу
+     *
+     * @param Builder $query
+     * @param array $types
+     * @return Builder
+     */
+    public function scopeFilterByType(Builder $query, array $types): Builder
+    {
+        return $query->whereIn('publication_type_id', $types);
+    }    
+
+    /**
+     * Фильтрация публикаций, только статьи в журналах
+     *
+     * @param Builder $query
+     * @return October\Rain\Database\Builder
+     */
+    public function scopeArticles(Builder $query): Builder
+    {
+        return $query->where('publication_type_id', 1);
+    }
+
+    /**
+     * Фильтрация публикаций, только статьи в журналах
+     *
+     * @param Builder $query
+     * @return October\Rain\Database\Builder
+     */
+    public function scopeInproceedings(Builder $query): Builder
+    {
+        return $query->where('publication_type_id', 2);
+    }
+
+    /**
+     * Фильтрация публикаций, только авторские свидетельства
+     *
+     * @param Builder $query
+     * @return October\Rain\Database\Builder
+     */
+    public function scopePatents(Builder $query): Builder
+    {
+        return $query->where('publication_type_id', 3);
+    }
+
+    /**
+     * Фильтрация публикаций, индексируемых WoS
+     *
+     * @param Builder $query
+     * @return October\Rain\Database\Builder
+     */
+    public function scopeIsWos(Builder $query): Builder
+    {
+        return $query->where('is_wos', 1);
+    }
+
+    /**
+     * Фильтрация публикаций, индексируемых Scopus
+     *
+     * @param Builder $query
+     * @return October\Rain\Database\Builder
+     */
+    public function scopeIsScopus(Builder $query): Builder
+    {
+        return $query->where('is_scopus', 1);
+    }
+
+    /**
+     * Фильтрация публикаций, индексируемых РИНЦ
+     *
+     * @param Builder $query
+     * @return October\Rain\Database\Builder
+     */
+    public function scopeIsRisc(Builder $query): Builder
+    {
+        return $query->where('is_risc', 1);
+    }
+
+    /**
+     * Возвращает коллекцию автоматически подобранных авторов, исходя из заполненого поля 'authors'
+     * Ключ - часть строки, значение - автор из базы данных типа \Bree7e\Cris\Models\Author
+     *
+     * @return \October\Rain\Database\Collection 
+     */
+    public function getAuthorSuggestions(): Collection
+    {                        
+        // разобрать авторов и убрать пробелы
+        $authorsArray = array_map('trim', explode(',',$this->authors));
+        $this->authors_count = count($authorsArray);
+
+        $result = new Collection();
+        $synonymsCollection = Synonym::all();
+        
+        foreach ($authorsArray as $publicationAuthor) {
+            // сравнение строк без пробелов
+            $trimPublicationAuthor = preg_replace('/\s+/', '', $publicationAuthor);
+            foreach ($synonymsCollection as $synonym) {
+                // TODO собрать неполные синонимы, такие как "Ветров А."" и просто "Ветров"
+                $fullSynonym = $synonym->lastname.$synonym->firstname.$synonym->middlename;
+                if ($trimPublicationAuthor == $fullSynonym) {
+                    $result->put($publicationAuthor, $synonym);
+                    break;
+                }
+                // если не нашли, то вернуть null
+                $result->put($publicationAuthor, null);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Привязать выбранных авторов к публикации
+     *
+     * @param array $authorsIds - массив идентификаторов авторов
+     * @return void
+     */
+    public function addAuthors(array $authorsIds = null)
+    {
+        $this->publication_authors()->sync($authorsIds);
+    }
+    
+
+    /**
+     * Автоматическое добавление авторов к публикации на основе строки "Авторы"
+     *
+     * @return int|boolean Возвращает количество добавленных авторов или false
+     */
+    public function autoAddAuthors()
+    {
+        // https://laravel.com/docs/5.5/eloquent-relationships#updating-many-to-many-relationships
+        // https://stackoverflow.com/questions/24702640/laravel-save-update-many-to-many-relationship
+
+        $relatedIds = [];
+
+        $suggestions = $this->getAuthorSuggestions();
+        foreach ($suggestions as $s) { // мы получаем синоним, по нему надо достать автора
+            if ($s) {
+                $relatedIds[] = $s->rb_author_id;
+            }
+            // $this->publication_authors()->attach($s->rb_author_id);
+        }
+
+        // сохранить количество авторов
+        $this->save(); 
+
+        $countAuthors = count($relatedIds);
+        if ($countAuthors === 0) return false;
+
+        $this->addAuthors($relatedIds);
+        return $countAuthors;
+    }    
+
+    /**
+     * Автоматически добавляет авторов к публикациям, где не привязаны авторы
+     *
+     * @return number Количество публикаций, к которым были привязаны авторы
+     */
+    public static function addAutoAllAuthors(): int
+    {
+        $count = 0;
+        $publications = Publication::all(); 
+            foreach ($publications as $pub) {
+                if ($pub->publication_authors->count() == 0) {
+                    $count++;
+                    $pub->autoAddAuthors();
+                }
+            }
+        return $count;
+    }
+
+    /**
+     * Возвращает список доступных опций классификаций публикаций
+     * для годового отчёта
+     * Метод используется в фильтре лист-контроллера Публикаций
+     * @return array Массив строк классификаций.
+     */
+    public function getClassificationOptions()
+    {
+        $result = [];
+
+        $type = DB::select(DB::raw('SHOW COLUMNS FROM bree7e_cris_publications WHERE field = "classification"'))[0]->Type;
+        preg_match('/^enum\((.*)\)$/', $type, $matches);
+        $values = array();
+        foreach(explode(',', $matches[1]) as $value){
+            $values[] = trim($value, "'");
+        }
+        $n = array_search('----------------------', $values);
+        $slice = array_slice($values, 0, $n);;
+        $result = array_combine($slice, $slice);;
+
+        return $result;
+    }    
+}

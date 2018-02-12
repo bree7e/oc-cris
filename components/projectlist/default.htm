@@ -1,0 +1,31 @@
+{##}
+{% set ongoingProjects = __SELF__.projects %}
+{% set finishedProjects = __SELF__.projects %}
+{% set projectPage = __SELF__.projectPage %}
+
+{% if ongoingProjects %}
+    <h2 class="ui header">Выполняемые на текущий год:</h2>
+    <ol class="ui list">
+    {% for p in ongoingProjects %} 
+        <li>
+            <a href="{{ projectPage|page({id: ' '}) ~ '/' ~ p.id }}">{{ p.name }}</a> 
+            <p>Номер проекта: {{ p.project_number|default('отсутствует') }}<br/>
+            {{ p.leader ? 'Руководитель: ' ~ p.leader.surname : 'Без руководителя'}}<br/>
+            Годы: {{ p.start_year }} {{ p.finish_year ? ' - ' ~ p.finish_year }}</p>
+        </li>
+    {% endfor %}
+    </ol>
+{% else %}
+    <h2 class="ui header">На текущий год в системе не зарегистрировано выполняемых проектов.</h2>
+{% endif %}
+<h2 class="ui header">Завершённые:</h2>
+<ol class="ui list">
+{% for p in finishedProjects %} 
+        <li>
+            <a href="{{ projectPage|page({id: ' '}) ~ '/' ~ p.id }}">{{ p.name }}</a> 
+            <p>Номер проекта: {{ p.project_number|default('отсутствует') }}<br/>
+            {{ p.leader ? 'Руководитель: ' ~ p.leader.surname : 'Без руководителя'}}<br/>
+            Годы: {{ p.start_year }} {{ p.finish_year ? ' - ' ~ p.finish_year }}</p>
+        </li>
+{% endfor %}
+</ol>

@@ -1,0 +1,109 @@
+{##}
+{% set author = __SELF__.author %}
+{% set publicationsByYears = __SELF__.publications %}
+{% set projectsByYears = __SELF__.projects %}
+{% set publicationPage = __SELF__.publicationPage %}
+{% set projectPage = __SELF__.projectPage %}
+
+<h1 class="ui header">{{ author.surname ~ ' ' ~ author.name ~ ' ' ~ author.middlename}}</h1>
+
+<div class="ui clearing vertical segment">
+    {% if author.avatar %}
+        <img class="ui rounded bordered floated image" src="{{url('/')}}{{ author.avatar.thumb(150, 200) }}">
+    {% else %}
+        <img class="ui rounded bordered floated image" src="{{url('/')}}/themes/christophheich-semantic-ui-octobercms/assets/images/avatar/placeholder.svg" width="200px">
+    {% endif %}
+    {# <p>Кандидат технических наук</p>
+    <p>Тема кадидатской диссерации: <i>Тема из базы данных</i></p> #}
+    <p>Автор {{ author.publicationCount }} статей</p>
+    <p><b>должность:</b>
+    {% for key, position in author.positions %}
+        {{ key > 0 ? ", "}}
+        {{ position.name|trim }}
+    {% endfor %}    
+    </p>
+    <p><b>e-mail:</b> {{ author.email }}</p>
+    <p><b>телефон:</b> {% for phone in author.phones %}
+        {{ phone.phones }}
+    {% endfor %}</p>
+    
+</div>
+
+{% if publicationsByYears %}
+<div class="ui vertical segment">
+    <h3 class="ui  header">Публикации</h3>
+    {% for year, publications in publicationsByYears %}
+        <h4>{{ year }}</h4>
+        <div class="ui bulleted list">
+        {% for publication in publications %}
+            <div class="item">
+                <div class="content">
+                    <div class="header"><a href="{{ publicationPage|page({id: ' '}) ~ '/' ~ publication.id }}">{{ publication.title }}</a> 
+                        <!-- Нужен switch для типов публикаций -->
+                        {% if publication.publication_type_id == 1 %}
+                        <div class="ui green mini label">Статья в журнале</div>
+
+                        {% elseif publication.publication_type_id == 2 %}
+                        <div class="ui orange mini label">Труды конференций</div>
+
+                        {% elseif publication.publication_type_id == 3 %}
+                        <div class="ui blue mini label">Авторское свидетельство</div>
+
+                        {% elseif publication.publication_type_id == 4 %}
+                        <div class="ui red mini label">Книга</div>
+
+                        {% elseif publication.publication_type_id == 6 %}
+                        <div class="ui black mini label">Диссертация</div>
+                        {% endif %}
+                    </div>
+                    <div class="description">
+                        <p>{{ publication.authors }}<br>
+                        в журнале <i>{{ publication.journal }}</i>, издательство <i>{{ publication.publisher }}</i> ({{ publication.adress }}), № {{ publication.number }}, с.{{ publication.pages }}</p>                            
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>    
+    {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if projectsByYears %}
+<div class="ui vertical segment">
+    <h3 class="ui  header">Руководство проектами</h3>
+    {% for year, projects in projectsByYears %}
+        <h4>{{ year }}</h4>
+        <div class="ui bulleted list">
+        {% for project in projects %}
+            <div class="item">
+                <div class="content">
+                    <div><a href="{{ projectPage|page({id: ' '}) ~ '/' ~ project.id }}">Проект {{ project.project_number }}</a> {{ project.name }}
+                        <!-- Нужен switch для типов публикаций -->
+                        {% if project.project_type_id == 1 %}
+                        <div class="ui green mini label">{{ project.projecttype.name }}</div>
+
+                        {% elseif project.project_type_id == 2 %}
+                        <div class="ui orange mini label">{{ project.projecttype.name }}</div>
+
+                        {% elseif project.project_type_id == 3 %}
+                        <div class="ui blue mini label">{{ project.projecttype.name }}</div>
+
+                        {% elseif project.project_type_id == 4 %}
+                        <div class="ui red mini label">{{ project.projecttype.name }}</div>
+
+                        {% elseif project.project_type_id == 6 %}
+                        <div class="ui black mini label">{{ project.projecttype.name }}</div>
+                        {% endif %}                        
+                    </div>
+                    <div class="description">
+                        <p>{{ project.description }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>    
+    {% endfor %}
+    </div>
+</div>
+{% endif %}

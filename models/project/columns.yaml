@@ -1,0 +1,22 @@
+columns:
+    name:
+        label: Название
+        type: text
+        searchable: true
+    'leader[surname]':
+        label: 'Руководитель'
+        type: relation
+        sortable: true
+    'projecttype[name]':
+        label: 'Тип проекта'
+        type: relation
+    start_year:
+        label: 'Год начала'
+        type: number
+        searchable: true
+        sortable: true
+    finish_year:
+        label: 'Год завершения'
+        type: number
+        searchable: true
+        sortable: true

@@ -1,0 +1,111 @@
+{##}
+<form class="ui form"
+    data-request="{{ __SELF__ }}::onLoadReport"
+    data-request-update="'{{ __SELF__ }}::raspil-list-by-departments': '#result'">
+    <div class="three wide field">
+        <label>Отчетный год</label>
+        <input name="year" type="number" value="2017" min="1990" max="2050">
+    </div>
+    <div class="grouped fields">
+        <label for="raspil-type">Способ деления</label>
+        <div class="field">
+            <div class="ui radio checkbox raspil-type-radio">
+                <input type="radio" name="raspil-type" checked tabindex="0" value="all" class="hidden">
+                <label>На общее количество авторов</label>
+            </div>
+        </div> 
+        <div class="field">
+            <div class="ui radio checkbox raspil-type-radio">
+                <input type="radio" name="raspil-type" tabindex="0" value="we" class="hidden">
+                <label>На авторов только из нашего института</label>
+            </div>
+        </div> 
+    </div>
+    <div class="grouped fields except-authors-radio disabled">
+        <label for="except-authors">Исключение авторов из расчета</label>
+        <div class="field">
+            <div class="ui radio checkbox">
+                <input type="radio" name="except-authors" checked tabindex="0" value="all" class="hidden">
+                <label>Учитывать всех авторов</label>
+            </div>
+        </div> 
+        <div class="field">
+            <div class="ui radio checkbox">
+                <input type="radio" name="except-authors" tabindex="0" value="except" class="hidden">
+                <label>Не учитывать отказавшихся</label>
+            </div>
+        </div> 
+    </div>    
+    <div class="grouped fields">
+        <label for="pub-list">Подробности расчёта</label>
+        <div class="field">
+            <div class="ui radio checkbox">
+                <input type="radio" name="pub-list" checked value="none" class="hidden">
+                <label>Не выводить</label>
+            </div>
+        </div> 
+        <div class="field">
+            <div class="ui radio checkbox">
+                <input type="radio" name="pub-list" value="list" class="hidden">
+                <label>Выводить список публикаций</label>
+            </div>
+        </div> 
+    </div>      
+    <div class="fields">
+        <div class="field">
+            <label>Статьи Wos</label>
+            <input name="art-wos" type="number" value="1" min="0" max="100" step="0.1">
+        </div>
+        <div class="field">
+            <label>Статьи Scopus</label>
+            <input name="art-scopus" type="number" value="0.5" min="0" max="100" step="0.1">
+        </div>
+        <div class="field">
+            <label>Статьи РИНЦ</label>
+            <input name="art-risc" type="number" value="0.3" min="0" max="100" step="0.1">
+        </div>
+        <div class="field">
+            <label>Труды Wos</label>
+            <input name="proc-wos" type="number" value="1" min="0" max="100" step="0.1">
+        </div>
+        <div class="field">
+            <label>Труды Scopus</label>
+            <input name="proc-scopus" type="number" value="0.5" min="0" max="100" step="0.1">
+        </div>
+        <div class="field">
+            <label>Труды РИНЦ</label>
+            <input name="proc-risc" type="number" value="0.3" min="0" max="100" step="0.1">
+        </div>
+        <div class="field">
+            <label>Монографии</label>
+            <input name="books" type="number" value="0.2" min="0" max="100" step="0.1">
+        </div>
+        <div class="field">
+            <label>Свидетельства о регистрации</label>
+            <input name="patents" type="number" value="0.1" min="0" max="100" step="0.1">
+        </div>
+    </div>
+    <div class="field">
+        <button type="submit" class="ui primary labeled icon button" data-attach-loading>
+            <i class="user icon"></i>Сформировать
+        </button> 
+    </div>      
+</form>                    
+<div id="result">
+    <!-- Сюда помещаяется паршл raspil-list   -->
+</div>
+
+{% put scripts %}
+    <script>
+        $('.ui.radio.checkbox').checkbox();
+
+        $('.raspil-type-radio').checkbox('setting', 'onChange', function(){
+            if (this.value == 'we') {
+                $('.except-authors-radio').removeClass('disabled');
+            } else {
+                $('.except-authors-radio').addClass('disabled');
+            }
+        }); 
+    </script>
+{% endput %}
+
