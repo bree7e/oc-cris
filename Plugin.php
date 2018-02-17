@@ -15,7 +15,10 @@ class Plugin extends PluginBase
      *
      * @var array
      */
-    public $require = ['RainLab.User'];
+    public $require = [
+        'RainLab.User',
+        'Mohsin.Rest'
+    ];
 
     /**
      * Returns information about this plugin.
