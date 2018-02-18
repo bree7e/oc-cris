@@ -5,11 +5,6 @@
 # Allowed Rest Actions
 allowedActions:
   index:
-      pageSize: 20
-  store:
-  show:
-  update:
-  destroy:
+      pageSize: 5
 
-# Model Class name
 modelClass: Bree7e\Cris\Models\Publication
