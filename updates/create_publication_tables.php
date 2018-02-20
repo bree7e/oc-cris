@@ -40,7 +40,7 @@ class CreatePublicationTables extends Migration
             $table->enum('type', ['Текст', 'Электронный ресурс','Карта','Программа для ЭВМ','База данных'])->default('Текст');
             $table->string('publisher')->nullable();
             $table->string('edition')->nullable()->comment('Пример: Издание 3-е, исправленное');
-            $table->enum('language', ['russian', 'english']);
+            $table->enum('language', ['russian', 'english'])->nullable();
             $table->enum('classification', [
                 'Монографии и главы в монографиях', 
                 'Статьи в российских журналах', 
@@ -67,7 +67,7 @@ class CreatePublicationTables extends Migration
                 'Препринты',
                 'Scopus',
                 'РИНЦ'
-            ]);
+            ])->nullable();
 
             
 

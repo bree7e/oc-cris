@@ -32,7 +32,7 @@ class CreateAuthorTables extends Migration
                 $table->string('middlename')->nullable();
                 $table->datetime('birthdate')->nullable();
                 $table->string('office')->nullable()->comment('Кабинет');
-                $table->json('phones')->nullable();
+                $table->text('phones')->nullable(); // json
                 $table->string('url')->nullable();
                 $table->integer('rb_adviser_id')->unsigned()->index()->nullable()->comment('Научный руководитель. user_id');
                 $table->integer('rb_consultant_id')->unsigned()->index()->nullable()->comment('Научный консультант. user_id');

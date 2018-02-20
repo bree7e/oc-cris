@@ -16,6 +16,7 @@ publication_authors:
     view:
         list: $/bree7e/cris/models/author/columns.yaml
         toolbarButtons: add|remove
+        toolbarPartial: relation_toolbar
     manage:
         showSearch: true
         recordsPerPage: 10

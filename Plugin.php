@@ -26,7 +26,7 @@ class Plugin extends PluginBase
     {
         return [
             'name'        => 'Current Research Information System',
-            'description' => 'No description provided yet...',
+            'description' => 'Система учёта публикаций',
             'author'      => 'Alexandr Vetrov',
             'icon'        => 'icon-leaf'
         ];

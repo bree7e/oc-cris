@@ -22,3 +22,12 @@
 1.0.10:
     - 'Added number columns to projects table. Import projects.'
     - projects_add_nioktr_number_and_url.php
+1.0.11:
+    - 'Several langs, quartile, vak and series added to publications. Type of column date now is date instead of number.'
+    - publications_add_quartile_series_vak.php
+    - projects_change_date_column_type.php
+    - seed_new_article_type_and_projecttype.php
+1.0.12: 'Publications may have an attached pdf file. Project import takes into date column.'
+1.0.13: 
+    - 'Add conference column to publications.'
+    - publications_add_conference.php

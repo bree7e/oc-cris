@@ -30,18 +30,18 @@ fields:
         oc.commentPosition: ''
         span: full
         type: text
-    start_year:
-        label: 'Год начала'
+    start_year_date:
+        label: 'Дата начала'
         oc.commentPosition: ''
-        emptyOption: Неизвестно
+        mode: date
         span: left
-        type: number
-    finish_year:
-        label: 'Год завершения'
+        type: datepicker
+    finish_year_date:
+        label: 'Дата завершения'
         oc.commentPosition: ''
-        emptyOption: Неизвестно
+        mode: date
         span: right
-        type: number
+        type: datepicker
     url:
         label: URL
         oc.commentPosition: ''

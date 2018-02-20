@@ -33,6 +33,13 @@ class Project extends Model
         'name' => 'required',
     ]; 
     
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'start_year_date',
+        'finish_year_date'
+    ];    
+
     /**
      * @var array Relations
      */

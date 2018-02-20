@@ -4,6 +4,8 @@ use Backend\Models\ImportModel;
 use Bree7e\Cris\Models\Author;
 use Bree7e\Cris\Models\Project;
 use Bree7e\Cris\Models\ProjectType;
+use Carbon\Carbon;
+use Carbon\Exceptions\InvalidArgumentException;
 
 /**
  * ProjectImport ImportModel
@@ -23,15 +25,28 @@ class ProjectImport extends ImportModel
         foreach ($results as $row => $data) {
 
             $projectType = ProjectType::getIdbyName($data['project_type']);
+            // Нужна поддержка, если не возвращается тип
             if ($projectType > 0) {
                 $data['project_type_id'] = $projectType;
             }
             unset($data['project_type']);
 
             $leader = Author::getSuggestions($data['leader'])->first();
-            unset($data['leader']);
             if ($leader) {
                 $data['rb_user_id'] = $leader->id;
+            }
+            unset($data['leader']);
+
+            if ($data['start_year_date']) {
+                $data['start_year_date'] = Carbon::createFromFormat('d.m.Y', $data['start_year_date']);
+            } else {
+                $data['start_year_date'] = null;
+            }
+
+            if ($data['finish_year_date']) {
+                $data['finish_year_date'] = Carbon::createFromFormat('d.m.Y', $data['finish_year_date']);
+            } else {
+                $data['finish_year_date'] = null;
             }
 
             try {

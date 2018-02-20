@@ -7,6 +7,7 @@ publications:
     view:
         list: $/bree7e/cris/models/publication/columns.yaml
         toolbarButtons: create|add|remove
+        recordsPerPage: 10
     manage:        
         form: $/bree7e/cris/models/publication/fields_simple.yaml
         showSearch: true

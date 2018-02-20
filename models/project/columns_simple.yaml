@@ -6,8 +6,8 @@ columns:
         label: 'Номер Цитис'
         type: text
     competition:
-        label: 'Конкурс'
-        type: text    
+        label: Конкурс
+        type: text
     name:
         label: Название
         type: text
@@ -15,22 +15,15 @@ columns:
     project_type:
         label: 'Тип проекта'
         type: number
-    start_year:
-        label: 'Год начала'
-        type: number
-    finish_year:
-        label: 'Год завершения'
-        type: number
-    # projecttype:
-    #     label: 'Тип проекта'
-    #     type: number
-    #     nameFrom: name
+    start_year_date:
+        label: 'Дата начала'
+        type: date
+    finish_year_date:
+        label: 'Дата завершения'
+        type: date
     leader:
         label: Руководитель
         type: text
     url:
         label: URL
         type: text
-
-
-

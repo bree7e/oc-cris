@@ -31,6 +31,7 @@ class Publications extends Controller
         parent::__construct();
 
         BackendMenu::setContext('Bree7e.Cris', 'cris', 'publications');
+        $this->addJs(url('plugins/bree7e/cris/assets/js/display-fields-errors.js'));
     }
 
     public function import()    // <=== Action method

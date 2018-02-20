@@ -40,7 +40,8 @@ class Publication extends Model
      */
     public $rules = [
         'authors' => 'required',
-        'title' => 'required'
+        'title' => 'required',
+        'publicationtype' => 'required'
         // publication_authors тоже надо будет добавить
     ];
 
@@ -51,8 +52,8 @@ class Publication extends Model
      */
     public $customMessages = [
         // 'required' => 'Поле :attribute обязательно',
-        'authors.required' => 'Необходимо обязательно заполнить поле "Авторы".',
-        'title.required' => 'Необходимо обязательно заполнить поле "Название публикации".'
+        'authors.required' => 'Необходимо заполнить поле "Авторы".',
+        'title.required' => 'Необходимо заполнить поле "Название публикации".'
     ];
 
     protected $dates = [
@@ -97,7 +98,9 @@ class Publication extends Model
     public $morphTo = [];
     public $morphOne = [];
     public $morphMany = [];
-    public $attachOne = [];
+    public $attachOne = [
+        'paper' => ['System\Models\File', 'public' => false]
+    ];
     public $attachMany = [];
 
     /**
