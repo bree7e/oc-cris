@@ -1,10 +1,9 @@
 <?php namespace Bree7e\Cris\Models;
 
-use Bree7e\Cris\Models\Author;
-use Bree7e\Cris\Models\AuthorAlternativeName as Synonym;
-use Bree7e\Cris\Models\Department;
+use Department;
+use AuthorAlternativeName as Synonym;
+use October\Rain\Auth\Models\User as UserModel;
 use October\Rain\Database\Collection;
-use Model;
 
 // TODO поискать как в октябре делают слаги
 
@@ -40,75 +39,8 @@ function ru2Lat($string, $gost = false)
 /**
  * Author Model
  */
-class Author extends Model
+class Author extends UserModel
 {
-    /**
-     * @var string The database table used by the model.
-     */
-    public $table = 'users';
-
-    /**
-     * @var array Guarded fields
-     */
-    protected $guarded = ['*'];
-
-    /**
-     * @var array The attributes that are mass assignable.
-     */
-    protected $fillable = [
-        'username',
-        'name',
-        'surname',
-        'middlename',
-        'birthdate',
-        'office',
-        'phones',
-        'url',
-        'last_login',
-        'drupal_id',
-        'login',
-        'email',
-        'password',
-        'password_confirmation',
-    ];
-
-    /**
-     * Purge attributes from data set.
-     */
-    protected $purgeable = [
-        'password_confirmation',
-        'send_invite',
-    ];
-
-    protected $dates = [
-        'birthdate',
-        'asp_start',
-        'asp_finish',
-        'last_seen',
-        'deleted_at',
-        'created_at',
-        'updated_at',
-        'activated_at',
-        'last_login',
-    ];
-
-    /**
-     * @var array Rules
-     */
-    public $rules = [
-        'email' => 'required|between:6,255|email|unique:users',
-        'username' => 'required|between:2,255|unique:users',
-        'password' => 'required:create|between:4,255|confirmed',
-        'password_confirmation' => 'required_with:password|between:4,255',
-    ];
-
-    protected $jsonable = [
-        'phones',
-    ];
-
-    /**
-     * @var array Relations
-     */
     public $hasMany = [
         'projects' => [
             'Bree7e\Cris\Models\Project',
@@ -119,48 +51,66 @@ class Author extends Model
             'key' => 'rb_author_id',
         ],
     ];
-    public $belongsTo = [
-        'adviser' => [
-            'Bree7e\Cris\Models\Author',
-            'key' => 'rb_adviser_id',
-        ],
-        'consultant' => [
-            'Bree7e\Cris\Models\Author',
-            'key' => 'rb_consultant_id',
-        ],
-    ];
-
-    public $belongsToMany = [
-        'groups' => [
-            'RainLab\User\Models\UserGroup',
-            'table' => 'users_groups',
-        ],
-        'publications' => [
-            'Bree7e\Cris\Models\Publication',
-            'table' => 'bree7e_cris_authors_publications', // таблица многие-ко-многим
-            'key' => 'rb_author_id', // Ключ этой модели в таблице М-М
-            'otherKey' => 'publication_id',
-        ],
-        'positions' => [
-            'Bree7e\Cris\Models\Position',
-            'table' => 'bree7e_cris_authors_departments_positions',
-            'key' => 'rb_author_id',
-            'otherKey' => 'position_id',
-            'pivot' => 'department_id',
-            'pivotModel' => 'Bree7e\Cris\Models\AuthorPositionPivot',
-        ],
-        'departments' => [
-            'Bree7e\Cris\Models\Department',
-            'table' => 'bree7e_cris_authors_departments_positions',
-            'key' => 'rb_author_id',
-            'otherKey' => 'department_id',
-        ],
-
-    ];
 
     public $attachOne = [
         'avatar' => ['System\Models\File'],
     ];
+
+
+    public function __construct() {
+        /**
+         * The attributes that should be mutated to dates.
+         *
+         * @var array
+         */
+        $this->dates = array_merge($this->dates,  [
+            'birthdate',
+            'asp_start',
+            'asp_finish'
+        ]);
+        /**
+         * @var array List of attribute names which are json encoded and decoded from the database.
+         */
+        $this->jsonable = array_merge($this->jsonable, ['phones']);
+
+        $this->belongsToMany = array_merge($this->belongsToMany, [
+            'publications' => [
+                'Bree7e\Cris\Models\Publication',
+                'table' => 'bree7e_cris_authors_publications', // таблица многие-ко-многим
+                'key' => 'rb_author_id', // Ключ этой модели в таблице М-М
+                'otherKey' => 'publication_id',
+            ],
+            'positions' => [
+                'Bree7e\Cris\Models\Position',
+                'table' => 'bree7e_cris_authors_departments_positions',
+                'key' => 'rb_author_id',
+                'otherKey' => 'position_id',
+                'pivot' => 'department_id',
+                'pivotModel' => 'Bree7e\Cris\Models\AuthorPositionPivot',
+            ],
+            'departments' => [
+                'Bree7e\Cris\Models\Department',
+                'table' => 'bree7e_cris_authors_departments_positions',
+                'key' => 'rb_author_id',
+                'otherKey' => 'department_id',
+            ],
+    
+        ]);      
+        
+        $this->belongsTo = array_merge($this->belongsTo, [
+            'adviser' => [
+                'Bree7e\Cris\Models\Author',
+                'key' => 'rb_adviser_id',
+            ],
+            'consultant' => [
+                'Bree7e\Cris\Models\Author',
+                'key' => 'rb_consultant_id',
+            ],
+        ]);    
+        
+        parent::__construct();
+    
+    }
 
     /**
      * Фильтрация авторов определенного подразделения

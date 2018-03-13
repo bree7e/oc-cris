@@ -105,7 +105,7 @@ class Authors extends ComponentBase
             $publicationsGroupedByYear[$p->year][] = $p;
         }
 
-        $projects = Project::ofLeader($author)->orderBy('start_year', 'desc')->get();
+        $projects = Project::ofLeader($author)->orderBy('start_year_date', 'desc')->get();
         $author->projectCount = $projects->count();
 
         $projectsGroupedByYear = [];
