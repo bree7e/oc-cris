@@ -12,7 +12,7 @@
         </div>
         <div class="field">
             <label>До года</label>
-            <input name="toYear" type="number" placeholder="" min="{{ now - 50 }}" max="{{ now + 5 }}">
+            <input name="toYear" type="number" value="{{ now }}" min="{{ now - 50 }}" max="{{ now + 5 }}">
         </div>
     </div>
     <div class="field">
@@ -80,9 +80,7 @@
 
     <script>
         $(document).ready(function() {
-            $('.ui.dropdown')
-                .dropdown()
-            ;
+            $('.ui.dropdown').dropdown();
 
             $('select[name="author"]')
                 .dropdown('setting', 'onChange', function(newValue){
@@ -91,14 +89,10 @@
                     } else {
                         $('#js-department').addClass('disabled');
                     }
-                     
                 }); 
 
-            $('#reset-fields')
-            .on('click', function() {
-                $('.ui.form .ui.dropdown')
-                .dropdown('restore defaults')
-                ;
+            $('#reset-fields').on('click', function() {
+                $('.ui.form .ui.dropdown').dropdown('restore defaults');
             })
             ;            
         });
