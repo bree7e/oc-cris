@@ -1,6 +1,6 @@
 <?php namespace Bree7e\Cris\Models;
 
-use Department;
+use Bree7e\Cris\Models\Department;
 use AuthorAlternativeName as Synonym;
 use October\Rain\Auth\Models\User as UserModel;
 use October\Rain\Database\Collection;
