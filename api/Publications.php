@@ -3,6 +3,7 @@
 use Backend\Classes\Controller;
 use Bree7e\Cris\Models\Publication;
 use Bree7e\Cris\Resources\Publication as PublicationResource;
+use Bree7e\Cris\Resources\PublicationCollection;
 
 /**
  * Publications Back-end API Controller
@@ -24,16 +25,17 @@ class Publications extends Controller
      */
     public function index()
     {
-        $page = input('page', 1);
-        $pageSize = 10;
+        $pageSize = input('per_page', 10);
+        if ($pageSize > 100) $pageSize = 100;
 
-        $publications = Publication::paginate($pageSize, $page);
+        $publications = Publication::paginate($pageSize);
 
         $publications->transform(function (Publication $publication) {
-            return (new PublicationResource($publication));
+            return new PublicationResource($publication);
         });
 
-        return $publications;
+        return new PublicationCollection($publications);
+        // return $publications;
     }
 
     /**
@@ -42,10 +44,10 @@ class Publications extends Controller
      * @param  \Bree7e\Cris\Models\Publication  $publication
      * @return \Illuminate\Http\Response
      */
-    // public function show(Publication $publication)
-    public function show($id)
+    public function show(Publication $publication)
+    // public function show($id)
     {
-        $publication = Publication::findOrFail($id);
+        // $publication = Publication::findOrFail($id);
 
         PublicationResource::withoutWrapping();
         return new PublicationResource($publication);
