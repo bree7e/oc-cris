@@ -9,9 +9,10 @@
 
 <div class="ui clearing vertical segment">
     {% if author.avatar %}
-        <img class="ui rounded bordered floated image" src="{{url('/')}}{{ author.avatar.thumb(150, 200) }}">
+        <img class="ui rounded bordered floated image" src="{{ url('/')}}{{ author.avatar.thumb(150, 200) }}">
     {% else %}
-        <img class="ui rounded bordered floated image" src="{{url('/')}}/themes/christophheich-semantic-ui-octobercms/assets/images/avatar/placeholder.svg" width="200px">
+        <img class="ui rounded bordered floated image" src="{{ '/plugins/bree7e/cris/assets/images/man.png'|app }}" width="200px">
+        
     {% endif %}
     {# <p>Кандидат технических наук</p>
     <p>Тема кадидатской диссерации: <i>Тема из базы данных</i></p> #}

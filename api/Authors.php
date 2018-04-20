@@ -2,22 +2,22 @@
 
 use Illuminate\Http\Request;
 use Backend\Classes\Controller;
-use Bree7e\Cris\Models\Publication;
+use Bree7e\Cris\Models\Author;
 use Bree7e\Cris\Resources\Publication as PublicationResource;
 use Bree7e\Cris\Resources\PublicationCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
- * Publications Back-end API Controller
+ * Authors Back-end API Controller
  */
-class Publications extends Controller
+class Authors extends Controller
 {
-    protected $publications;
+    protected $authors;
 
-    public function __construct(Publication $publications)
+    public function __construct(Author $authors)
     {
         parent::__construct();
-        $this->publications = $publications;
+        $this->authors = $authors;
     }
 
     /**
@@ -27,41 +27,41 @@ class Publications extends Controller
      */
     public function index()
     {
-        $pageSize = input('per_page', 10);
+        $pageSize = input('per_page', 50);
         if ($pageSize > 100) $pageSize = 100;
 
-        $publications = $this->publications->paginate($pageSize);
+        $authors = $this->authors->paginate($pageSize);
 
-        $publications->transform(function (Publication $publication) {
-            return new PublicationResource($publication);
+        $authors->transform(function (Publication $author) {
+            return new PublicationResource($author);
         });
 
-        return new PublicationCollection($publications);
-        // return $publications;
+        return new PublicationCollection($authors);
+        // return $authors;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \Bree7e\Cris\Models\Publication  $publication
+     * @param  \Bree7e\Cris\Models\Publication  $author
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         try {
-            $publication = $this->publications->findOrFail($id);
+            $author = $this->authors->findOrFail($id);
         } catch (ModelNotFoundException $ex) {
             return response()->json([
                 'error' => [
                     'status_code' => 404,
-                    'message' => "Publication $id not found",
+                    'message' => "Author $id not found",
                     'type' => 'ModelNotFoundException'
                 ]
             ], 404);
         }
 
         PublicationResource::withoutWrapping();
-        return new PublicationResource($publication);
+        return new PublicationResource($author);
     }
 
     /**
