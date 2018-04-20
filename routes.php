@@ -4,6 +4,8 @@ Route::group(['prefix' => 'api/v1'], function () {
     Route::apiResource('publications', 'Bree7e\Cris\Api\Publications')
         ->middleware('web')
         ->only(['index', 'show']);
+
+    Route::get('publications/search/{phrase}', 'Bree7e\Cris\Api\Publications@search');
 });
 
 Route::get('api/hello', function() {

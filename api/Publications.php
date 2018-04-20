@@ -1,5 +1,6 @@
 <?php namespace Bree7e\Cris\Api;
 
+use Illuminate\Http\Request;
 use Backend\Classes\Controller;
 use Bree7e\Cris\Models\Publication;
 use Bree7e\Cris\Resources\Publication as PublicationResource;
@@ -20,7 +21,7 @@ class Publications extends Controller
 
     /**
      * Display a listing of the resource.
-
+     * 
      * @return \Illuminate\Http\Response
      */
     public function index()
@@ -50,8 +51,13 @@ class Publications extends Controller
         return new PublicationResource($publication);
     }
 
-    public function search()
+    /**
+     * Поиск публикаций
+     *
+     * @param  \Illuminate\Http\Request
+     */
+    public function search(Request $request, $phrase)
     {   
-        return 'Hello World';
+        return 'Hello World. You phrase is "' . $phrase . '"';
     }
 }
