@@ -10,13 +10,13 @@ use Bree7e\Cris\Resources\PublicationCollection;
  */
 class Publications extends Controller
 {
-    // protected $publications;
+    protected $publications;
 
-    // public function __construct(Publication $publications)
-    // {
-    //     parent::__construct();
-    //     $this->publications = $publications;
-    // }
+    public function __construct(Publication $publications)
+    {
+        parent::__construct();
+        $this->publications = $publications;
+    }
 
     /**
      * Display a listing of the resource.
@@ -28,7 +28,7 @@ class Publications extends Controller
         $pageSize = input('per_page', 10);
         if ($pageSize > 100) $pageSize = 100;
 
-        $publications = Publication::paginate($pageSize);
+        $publications = $this->publications->paginate($pageSize);
 
         $publications->transform(function (Publication $publication) {
             return new PublicationResource($publication);
@@ -45,11 +45,13 @@ class Publications extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Publication $publication)
-    // public function show($id)
     {
-        // $publication = Publication::findOrFail($id);
-
         PublicationResource::withoutWrapping();
         return new PublicationResource($publication);
+    }
+
+    public function search()
+    {   
+        return 'Hello World';
     }
 }
