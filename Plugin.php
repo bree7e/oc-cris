@@ -16,8 +16,7 @@ class Plugin extends PluginBase
      * @var array
      */
     public $require = [
-        'RainLab.User',
-        'Mohsin.Rest'
+        'RainLab.User'
     ];
 
     /**
