@@ -11,11 +11,11 @@ GET {{site}}/api/v1/publications/1
 GET {{site}}
 
 ###
-POST http://ris.loc/api/v1/publications HTTP/1.1
+POST {{site}}/api/v1/publications HTTP/1.1
 content-type: application/json
 
 {   
-    "id": 3,
+    "id": 1003,
     "authors": "Ветров А.А., Фереферов Е.С.",
     "authors_count": 2,
     "publication_type_id": 1,
@@ -49,8 +49,6 @@ content-type: application/json
 
 ###
 DELETE {{site}}/api/v1/publications/6
-
-
 
 ###
 GET {{site}}/api/v1/projects HTTP/1.1

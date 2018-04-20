@@ -1,7 +1,7 @@
 <?php
 
 Route::group(['prefix' => 'api/v1'], function () {
-    Route::resource('publications', 'Bree7e\Cris\Api\Publications');
+    Route::apiResource('publications', 'Bree7e\Cris\Api\Publications')->only(['index', 'show']);
 });
 
 Route::get('api/hello', function() {
@@ -9,15 +9,6 @@ Route::get('api/hello', function() {
 });
 
 // Route::get('/welcome', 'authorName\pluginName\WelcomeController@index');
-
-
-// ahmadfatoni code
-// Route::post('fatoni/generate/api', array('as' => 'fatoni.generate.api', 'uses' => 'AhmadFatoni\ApiGenerator\Controllers\ApiGeneratorController@generateApi'));
-// Route::post('fatoni/update/api/{id}', array('as' => 'fatoni.update.api', 'uses' => 'AhmadFatoni\ApiGenerator\Controllers\ApiGeneratorController@updateApi'));
-// Route::get('fatoni/delete/api/{id}', array('as' => 'fatoni.delete.api', 'uses' => 'AhmadFatoni\ApiGenerator\Controllers\ApiGeneratorController@deleteApi'));
-
-// Route::resource('api/publications', 'AhmadFatoni\ApiGenerator\Controllers\API\PublicationController', ['except' => ['destroy', 'create', 'edit']]);
-// Route::get('api/publications/{id}/delete', ['as' => 'api/publications.delete', 'uses' => 'AhmadFatoni\ApiGenerator\Controllers\API\PublicationController@destroy']);
 
 // Route::get('api/populate', function(){
 //     $faker = Faker\Factory::create();
