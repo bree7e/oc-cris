@@ -28,9 +28,9 @@ class RaspilReport extends ComponentBase
      * Выбор коэффициента публикации
      * @var Bree7e\Cris\Models\Publication $p - публикация
      *
-     * @return int Коэффициент
+     * @return float Коэффициент
      */
-    protected function chooseCoefficient(Publication $p): int
+    protected function chooseCoefficient(Publication $p): float
     {   
         $request = Request()->all();
         $k = 0; 
@@ -91,7 +91,7 @@ class RaspilReport extends ComponentBase
 
         switch ($request['raspil-type']) {
             case 'all': // все
-                $count = $p->authors_count;
+                $count = $p->authors_count ?? 0;
                 break;
             case 'we': // только наши
                 switch ($request['except-authors']) {
@@ -134,8 +134,7 @@ class RaspilReport extends ComponentBase
             ->with('publication_authors')
             ->get()
             ->keyBy('id');
-
-        $authors = Author::ofScientificDepartments()->get()->keyBy('id');
+ 
         foreach ($publications as $p) {
             $p->k = $this->chooseCoefficient($p);
         }
@@ -146,13 +145,10 @@ class RaspilReport extends ComponentBase
                 if ($publications[$p->translated_version->id]->k >= $p->k) {
                     $p->k = 0;
                     $p->hasTranslatedVersion = true;
+                    continue;
                 }     
             }
-            
-            if ($p->k === 0) {
-                continue;
-            }
-            
+                        
             // пометить публикации с отказавшимися авторами
             if (($request['raspil-type'] == 'we') and ($request['except-authors'] == 'except')){
                 foreach ($p->publication_authors as $author) { 
@@ -162,7 +158,11 @@ class RaspilReport extends ComponentBase
                     }
                 }
             }
-                        
+        }        
+        
+        $authors = Author::ofScientificDepartments()->get()->keyBy('id');
+
+        foreach ($publications as $p) {              
             $pCountAuthor = $this->getPublicationAuthorCount($p);
             
             if ($pCountAuthor == 0) {
@@ -247,7 +247,7 @@ class RaspilReport extends ComponentBase
         foreach ($authors as $a) {
             if ($a->is_except and $request['raspil-type'] == 'we' and $request['except-authors'] == 'except') {
                 $a->hasExcepted = true; // исключён из расчета
-                $a->patentTotal = 0;
+                $a->total = 0;
                 continue;
             }            
             $a->total =
