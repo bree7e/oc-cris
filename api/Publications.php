@@ -43,7 +43,6 @@ class Publications extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \Bree7e\Cris\Models\Publication  $publication
      * @return \Illuminate\Http\Response
      */
     public function show($id)

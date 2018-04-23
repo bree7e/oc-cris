@@ -2,11 +2,12 @@
 
 Route::group(['prefix' => 'api/v1'], function () {
     Route::apiResource('publications', 'Bree7e\Cris\Api\Publications')
-        ->middleware('web')
-        ->only(['index', 'show']);
-
+        ->only(['index', 'show']);        
     Route::get('publications/search/{phrase}', 'Bree7e\Cris\Api\Publications@search');
-});
+
+    Route::apiResource('authors', 'Bree7e\Cris\Api\Authors')
+        ->only(['index', 'show']);
+    });
 
 Route::get('api/hello', function() {
     return 'Hello World';

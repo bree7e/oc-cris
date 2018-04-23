@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Backend\Classes\Controller;
 use Bree7e\Cris\Models\Author;
-use Bree7e\Cris\Resources\Publication as PublicationResource;
-use Bree7e\Cris\Resources\PublicationCollection;
+use Bree7e\Cris\Resources\Author as AuthorResource;
+// use Bree7e\Cris\Resources\PublicationCollection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
@@ -32,18 +32,17 @@ class Authors extends Controller
 
         $authors = $this->authors->paginate($pageSize);
 
-        $authors->transform(function (Publication $author) {
-            return new PublicationResource($author);
+        $authors->transform(function (Author $author) {
+            return new AuthorResource($author);
         });
 
-        return new PublicationCollection($authors);
-        // return $authors;
+        return $authors;
+        // return new PublicationCollection($authors);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \Bree7e\Cris\Models\Publication  $author
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -60,17 +59,10 @@ class Authors extends Controller
             ], 404);
         }
 
+        return $author;
+
         PublicationResource::withoutWrapping();
         return new PublicationResource($author);
     }
 
-    /**
-     * Поиск публикаций
-     *
-     * @param  \Illuminate\Http\Request
-     */
-    public function search(Request $request, $phrase)
-    {   
-        return 'Hello World. You phrase is "' . $phrase . '"';
-    }
 }
