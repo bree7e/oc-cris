@@ -7,6 +7,7 @@ use Cms\Classes\ComponentBase;
 use Flash;
 use Illuminate\Http\Request;
 use October\Rain\Database\Collection;
+use ApplicationException;
 
 class RaspilReport extends ComponentBase
 {
@@ -24,6 +25,96 @@ class RaspilReport extends ComponentBase
     }
 
     /**
+     * Выбор коэффициента публикации
+     * @var Bree7e\Cris\Models\Publication $p - публикация
+     *
+     * @return int Коэффициент
+     */
+    protected function chooseCoefficient(Publication $p): int
+    {   
+        $request = Request()->all();
+        $k = 0; 
+
+        switch ($p->publication_type_id) {
+            case '1': // articles
+                if ($p->is_wos) {
+                    switch ($p->quartile) {
+                        case 'Q1':
+                            $k = $request['art-wos-q1'];
+                        break;
+                        case 'Q2':
+                            $k = $request['art-wos-q2'];
+                        break;
+                        case 'Q3':
+                            $k = $request['art-wos-q3'];
+                        break;
+                        case 'Q4':
+                            $k = $request['art-wos-q4'];
+                        break;
+                        default:
+                            $k = $request['art-wos-q5'];
+                        break;
+                    }
+                } elseif ($p->is_scopus) {
+                    $k = $request['art-scopus'];
+                } elseif ($p->is_risc) {
+                    $k = $request['art-risc'];
+                }
+                break;
+
+            case '2': // inproceedings
+                if ($p->is_wos) {
+                    $k = $request['proc-wos'];
+                } elseif ($p->is_scopus) {
+                    $k = $request['proc-scopus'];
+                } elseif ($p->is_risc) {
+                    $k = $request['proc-risc'];
+
+                }
+                break;
+
+            case '3': // patents
+                $k = $request['patents'];
+                break;
+
+            case '4': // books
+                $k = $request['books'];
+                break;
+        } 
+        return $k;       
+    }
+
+    protected function getPublicationAuthorCount(Publication $p): int
+    {
+        $request = Request()->all();
+        $count = 0;
+
+        switch ($request['raspil-type']) {
+            case 'all': // все
+                $count = $p->authors_count;
+                break;
+            case 'we': // только наши
+                switch ($request['except-authors']) {
+                    case 'all': // учитывать всех
+                        $count = $p->publication_authors->count();
+                        break;
+                    case 'except': // не учитвать отказавшихся
+                        $count = 0;
+                        foreach ($p->publication_authors as $author) { 
+                            if ($author->is_except) {
+                                continue; 
+                            } else {
+                                $count++;
+                            }
+                        }
+                        break;
+                }
+                break;
+        }
+        return $count;
+    }
+
+    /**
      * Расчет ПРНД
      * @var $k - общий коэффициент статьи
      * @var $pk - персональный коэффициент автора за статью
@@ -35,6 +126,9 @@ class RaspilReport extends ComponentBase
     {
         $request = Request()->all();
         $this->year = $request['year'];
+        if (empty($this->year)) {
+            throw new ApplicationException("Следует указать год");
+        }
 
         $publications = Publication::whereReportYear($this->year)
             ->with('publication_authors')
@@ -43,88 +137,39 @@ class RaspilReport extends ComponentBase
 
         $authors = Author::ofScientificDepartments()->get()->keyBy('id');
         foreach ($publications as $p) {
-            $k = 0; // общий коэффициент статьи
-            switch ($p->publication_type_id) {
-                case '1': // articles
-                    if ($p->is_wos) {
-                        $k = $request['art-wos'];
-                    } elseif ($p->is_scopus) {
-                        $k = $request['art-scopus'];
-                    } elseif ($p->is_risc) {
-                        $k = $request['art-risc'];
-                    }
-                    break;
-                case '2': // inproceedings
-                    if ($p->is_wos) {
-                        $k = $request['proc-wos'];
-                    } elseif ($p->is_scopus) {
-                        $k = $request['proc-scopus'];
-                    } elseif ($p->is_risc) {
-                        $k = $request['proc-risc'];
-
-                    }
-                    break;
-                case '3': // patents
-                    $k = $request['patents'];
-                    break;
-                case '4': // books
-                    $k = $request['books'];
-                    break;
-            }
-            $p->k = $k;
+            $p->k = $this->chooseCoefficient($p);
         }
 
+        // отдельный цикл, чтобы сравнить коэффициенты переводных версий
         foreach ($publications as $p) {
-
-            // если у переводной статьи коэффициент выше
             if ($p->translated_version) {
                 if ($publications[$p->translated_version->id]->k >= $p->k) {
                     $p->k = 0;
                     $p->hasTranslatedVersion = true;
                 }     
             }
-            $k = $p->k;
-
-            // надо проверить статьи, где есть сслыки на переводы
-            // если коэффициент перевода выше, то этой поставить 0
-            // и флаг есть_перевод 
-
-            if ($k === 0) {
+            
+            if ($p->k === 0) {
                 continue;
             }
-
-            // допустим k = 0,7
-            $pCountAuthor = 0;
-            switch ($request['raspil-type']) {
-                case 'all': // все
-                    $pCountAuthor = $p->authors_count;
-                    break;
-                case 'we': // только наши
-                    switch ($request['except-authors']) {
-                        case 'all': // учитывать всех
-                            $pCountAuthor = $p->publication_authors->count();
-                            break;
-                        case 'except': // не учитвать отказавшихся
-                            $pCountAuthor = 0;
-                            foreach ($p->publication_authors as $author) { 
-                                if ($author->is_except) {
-                                    $p->hasExceptAuthors = true;
-                                    continue; 
-                                } else {
-                                    $pCountAuthor++;
-                                }
-                            }
-                            break;
+            
+            // пометить публикации с отказавшимися авторами
+            if (($request['raspil-type'] == 'we') and ($request['except-authors'] == 'except')){
+                foreach ($p->publication_authors as $author) { 
+                    if ($author->is_except) {
+                        $p->hasExceptAuthors = true;
+                        break; 
                     }
-                    break;
+                }
             }
-
+                        
+            $pCountAuthor = $this->getPublicationAuthorCount($p);
+            
             if ($pCountAuthor == 0) {
-                $k = 0;
                 continue;
             } else {
                 try {
-                    $pk = $k / $pCountAuthor;
+                    $pk = $p->k / $pCountAuthor;
                 } catch (\DivisionByZeroError $er) {
                     throw new AjaxException("Деление на 0 авторов. Публикация $p->id");
                 } catch (\Exception $ex) {
@@ -133,12 +178,11 @@ class RaspilReport extends ComponentBase
                     } else {
                         Flash::error($ex->getMessage());
                     }
-
+                    
                 }
             }
 
             if ($request['pub-list'] === 'list') {
-                $p->k = $k;
                 $p->pk = $pk;
                 $p->countAuthor = $pCountAuthor;
             }
@@ -207,14 +251,14 @@ class RaspilReport extends ComponentBase
                 continue;
             }            
             $a->total =
-            $a->artWosTotal +
-            $a->artScopusTotal +
-            $a->artRiscTotal +
-            $a->procWosTotal +
-            $a->procScopusTotal +
-            $a->procRiscTotal +
-            $a->bookTotal +
-            $a->patentTotal;
+                $a->artWosTotal +
+                $a->artScopusTotal +
+                $a->artRiscTotal +
+                $a->procWosTotal +
+                $a->procScopusTotal +
+                $a->procRiscTotal +
+                $a->bookTotal +
+                $a->patentTotal;
         }
 
         // перечень научных отделов

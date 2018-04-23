@@ -50,6 +50,18 @@ class Structure extends ComponentBase
     {
         $departments = Department::siblings()->with('authors')->with('positions')->get();
 
+        array_walk_recursive($departments, function ($d) {
+            $a = 1;
+            if ($d->authors) $d->authors->each(function ($a) {
+                $a->positionSum = $a->positions->pluck('sort_order')->sum();
+            });            
+        });
+
+        array_walk_recursive($departments, function ($d) {
+            if ($d->authors) {
+                // $d->authors = $d->authors->sortBy('positionSum');            
+            }
+        });
         // высчитать сумму веса сотрудника по его должностям в поле positionSum
         // нужно сделать это рекурсивно
         // foreach ($departments as $department) {

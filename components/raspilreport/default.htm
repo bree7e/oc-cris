@@ -1,4 +1,19 @@
 {##}
+
+{% put scripts %}
+    <script>
+        $('.ui.radio.checkbox').checkbox();
+
+        $('.raspil-type-radio').checkbox('setting', 'onChange', function(){
+            if (this.value == 'we') {
+                $('.except-authors-radio').removeClass('disabled');
+            } else {
+                $('.except-authors-radio').addClass('disabled');
+            }
+        }); 
+    </script>
+{% endput %}
+
 <form class="ui form"
     data-request="{{ __SELF__ }}::onLoadReport"
     data-request-update="'{{ __SELF__ }}::raspil-list-by-departments': '#result'">
@@ -51,38 +66,61 @@
             </div>
         </div> 
     </div>      
+    <h4 class="ui dividing header">Коэффициенты</h4>
     <div class="fields">
         <div class="field">
-            <label>Статьи Wos</label>
-            <input name="art-wos" type="number" value="1" min="0" max="100" step="0.1">
+            <label>Статьи Wos Q1</label>
+            <input name="art-wos-q1" type="number" value="2" min="0" max="10" step="0.05">
+        </div>
+        <div class="field">
+            <label>Статьи Wos Q2</label>
+            <input name="art-wos-q2" type="number" value="1" min="0" max="10" step="0.05">
+        </div>
+        <div class="field">
+            <label>Статьи Wos Q3</label>
+            <input name="art-wos-q3" type="number" value="1" min="0" max="10" step="0.05">
+        </div>
+        <div class="field">
+            <label>Статьи Wos Q4</label>
+            <input name="art-wos-q4" type="number" value="1" min="0" max="10" step="0.05">
+        </div>
+    </div>
+    <div class="fields">        
+        <div class="field">
+            <label>Статьи Wos ESCI</label>
+            <input name="art-wos-q5" type="number" value="0.6" min="0" max="10" step="0.05">
         </div>
         <div class="field">
             <label>Статьи Scopus</label>
-            <input name="art-scopus" type="number" value="0.5" min="0" max="100" step="0.1">
+            <input name="art-scopus" type="number" value="0.6" min="0" max="10" step="0.05">
         </div>
         <div class="field">
             <label>Статьи РИНЦ</label>
-            <input name="art-risc" type="number" value="0.3" min="0" max="100" step="0.1">
+            <input name="art-risc" type="number" value="0.3" min="0" max="10" step="0.05">
         </div>
-        <div class="field">
+    </div>
+    <div class="fields">
+        <div class="three field">
             <label>Труды Wos</label>
-            <input name="proc-wos" type="number" value="1" min="0" max="100" step="0.1">
+            <input name="proc-wos" type="number" value="0.3" min="0" max="100" step="0.05">
         </div>
         <div class="field">
             <label>Труды Scopus</label>
-            <input name="proc-scopus" type="number" value="0.5" min="0" max="100" step="0.1">
+            <input name="proc-scopus" type="number" value="0.25" min="0" max="100" step="0.05">
         </div>
         <div class="field">
             <label>Труды РИНЦ</label>
-            <input name="proc-risc" type="number" value="0.3" min="0" max="100" step="0.1">
+            <input name="proc-risc" type="number" value="0.1" min="0" max="100" step="0.05">
         </div>
+    </div>
+    <div class="fields">
         <div class="field">
             <label>Монографии</label>
-            <input name="books" type="number" value="0.2" min="0" max="100" step="0.1">
+            <input name="books" type="number" value="4" min="0" max="100" step="0.05">
         </div>
         <div class="field">
             <label>Свидетельства о регистрации</label>
-            <input name="patents" type="number" value="0.1" min="0" max="100" step="0.1">
+            <input name="patents" type="number" value="0.2" min="0" max="100" step="0.05">
         </div>
     </div>
     <div class="field">
@@ -95,17 +133,5 @@
     <!-- Сюда помещаяется паршл raspil-list   -->
 </div>
 
-{% put scripts %}
-    <script>
-        $('.ui.radio.checkbox').checkbox();
 
-        $('.raspil-type-radio').checkbox('setting', 'onChange', function(){
-            if (this.value == 'we') {
-                $('.except-authors-radio').removeClass('disabled');
-            } else {
-                $('.except-authors-radio').addClass('disabled');
-            }
-        }); 
-    </script>
-{% endput %}
 
