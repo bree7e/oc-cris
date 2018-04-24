@@ -11,6 +11,10 @@ columns:
         label: Тип
         relation: publicationtype
         select: name
+    best_indexation:
+        label: Индекс
+        type: text
+        sortable: false
     journal:
         label: Журнал
         type: text

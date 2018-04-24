@@ -104,6 +104,41 @@ class Publication extends Model
     public $attachMany = [];
 
     /**
+     * Наивысшая индексация. WoS по квартилям >  Scopus > РИНЦ
+     *
+     * @return void
+     */
+    public function getBestIndexationAttribute()
+    {
+        if ($this->is_wos) {
+            if (!$this->quartile) return 'Web of Science';
+            switch ($this->quartile) {
+                case 'Q1':
+                    return 'Web of Science Q1';
+                    break;
+                case 'Q2':
+                    return 'Web of Science Q2';
+                    break;
+                case 'Q3':
+                    return 'Web of Science Q3';
+                    break;
+                case 'Q4':
+                    return 'Web of Science Q4';
+                    break;                
+                case 'Q5':
+                    return 'Web of Science Emerging Sources Citation Index';
+                    break;                
+            }
+        }
+
+        if ($this->is_scopus) return 'Scopus';
+        if ($this->is_risc && $this->is_vak) return 'ВАК + РИНЦ';
+        if ($this->is_risc) return 'РИНЦ';
+        if ($this->is_vak) return 'ВАК';
+        return '-';
+    }
+
+    /**
      * Фильтрация публикаций по отчетному году
      *
      * @param Builder $query

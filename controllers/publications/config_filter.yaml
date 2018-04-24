@@ -41,6 +41,17 @@ scopes:
             scopus: Scopus
             risc: РИНЦ
             vak: ВАК
+    quartile:
+        label: Квартиль WoS
+        modelClass: Bree7e\Cris\Models\Publication
+        type: group
+        conditions: quartile in (:filtered)   
+        options:
+            Q1: 'Wed of Science Q1'
+            Q2: 'Wed of Science Q2'
+            Q3: 'Wed of Science Q3'
+            Q4: 'Wed of Science Q4'
+            Q5: 'WoS Emerging Sources Citation Index'
     journal:
         label: Журнал (%)
         type: text
