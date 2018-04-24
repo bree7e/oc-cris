@@ -116,6 +116,27 @@ class Publication extends Model
     }
 
     /**
+     * Фильтрация публикаций по отчетным годам
+     *
+     * @param Builder $query
+     * @param int $year
+     * @return \October\Rain\Database\Builder
+     */
+
+     /**
+      * Фильтрация публикаций по диапазону отчётных годов
+      *
+      * @param Builder $query
+      * @param integer $startYear
+      * @param integer $finishYear
+      * @return \October\Rain\Database\Builder
+      */
+    public function scopeWhereReportYearBetween(Builder $query, int $startYear = 0, int $finishYear = 2100): Builder
+    {
+        return $query->whereBetween('reportYear', [$startYear, $finishYear]);
+    }
+
+    /**
      * Фильтрация публикаций по годам
      *
      * @param Builder $query

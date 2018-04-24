@@ -8,11 +8,11 @@ use Flash;
 use Illuminate\Http\Request;
 use October\Rain\Database\Collection;
 use ApplicationException;
+use AjaxException;
 
 class RaspilReport extends ComponentBase
 {
     public $authors;
-    public $year;
     public $departments;
     public $publications;
 
@@ -33,6 +33,7 @@ class RaspilReport extends ComponentBase
     protected function chooseCoefficient(Publication $p): float
     {   
         $request = Request()->all();
+        $request = input();
         $k = 0; 
 
         switch ($p->publication_type_id) {
@@ -86,15 +87,16 @@ class RaspilReport extends ComponentBase
 
     protected function getPublicationAuthorCount(Publication $p): int
     {
-        $request = Request()->all();
         $count = 0;
+        $reportType = input('raspil-type');
+        $except = input('except-authors');
 
-        switch ($request['raspil-type']) {
+        switch ($reportType) {
             case 'all': // все
                 $count = $p->authors_count ?? 0;
                 break;
             case 'we': // только наши
-                switch ($request['except-authors']) {
+                switch ($except) {
                     case 'all': // учитывать всех
                         $count = $p->publication_authors->count();
                         break;
@@ -114,6 +116,56 @@ class RaspilReport extends ComponentBase
         return $count;
     }
 
+    protected function initAuthorSumsByPublicationTypes(Author $author): Author
+    {
+        $author->artWosQ1Total = 0;
+        $author->artWosQ2Total = 0;
+        $author->artWosQ3Total = 0;
+        $author->artWosQ4Total = 0;
+        $author->artWosQ5Total = 0;
+        $author->artWosTotal = 0;
+        $author->artScopusTotal = 0;
+        $author->artRiscTotal = 0;
+        $author->procWosTotal = 0;
+        $author->procScopusTotal = 0;
+        $author->procRiscTotal = 0;
+        $author->patentTotal = 0;
+        $author->bookTotal = 0;
+        return $author;
+    }
+
+    protected function addDividedPublicationCoefficientToAuthor(Publication $publication, Author $author): Author
+    {
+        switch ($publication->publication_type_id) {
+            case '1': // articles
+                if ($publication->is_wos) {
+                    // TODO Нужна логика по отдельным квартилям
+                    $author->artWosTotal += $publication->dividedK;
+                } elseif ($publication->is_scopus) {
+                    $author->artScopusTotal += $publication->dividedK;
+                } elseif ($publication->is_risc) {
+                    $author->artRiscTotal += $publication->dividedK;
+                }
+                break;
+            case '2': // inproceedings
+                if ($publication->is_wos) {
+                    $author->procWosTotal += $publication->dividedK;
+                } elseif ($publication->is_scopus) {
+                    $author->procScopusTotal += $publication->dividedK;
+                } elseif ($publication->is_risc) {
+                    $author->procRiscTotal += $publication->dividedK;
+                }
+                break;
+            case '3': // patents
+                $author->patentTotal += $publication->dividedK;
+                break;
+            case '4': // books
+                $author->bookTotal += $publication->dividedK;
+                break;
+        }
+
+        return $author;
+    }
     /**
      * Расчет ПРНД
      * @var $k - общий коэффициент статьи
@@ -124,13 +176,18 @@ class RaspilReport extends ComponentBase
      */
     protected function onLoadReport()
     {
-        $request = Request()->all();
-        $this->year = $request['year'];
-        if (empty($this->year)) {
-            throw new ApplicationException("Следует указать год");
+        $request = input();
+
+        $startYear = input('year[from]');
+        $finishYear = input('year[to]');
+        if (empty($startYear)) {
+            throw new ApplicationException('Следует указать "Первый отчетный год"');
+        }
+        if (empty($finishYear)) {
+            throw new ApplicationException('Следует указать "Последний отчетный год"');
         }
 
-        $publications = Publication::whereReportYear($this->year)
+        $publications = Publication::whereReportYearBetween($startYear, $finishYear)
             ->with('publication_authors')
             ->get()
             ->keyBy('id');
@@ -163,43 +220,20 @@ class RaspilReport extends ComponentBase
         $authors = Author::ofScientificDepartments()->get()->keyBy('id');
 
         foreach ($publications as $p) {              
-            $pCountAuthor = $this->getPublicationAuthorCount($p);
-            
-            if ($pCountAuthor == 0) {
-                continue;
-            } else {
-                try {
-                    $pk = $p->k / $pCountAuthor;
-                } catch (\DivisionByZeroError $er) {
-                    throw new AjaxException("Деление на 0 авторов. Публикация $p->id");
-                } catch (\Exception $ex) {
-                    if (Request::ajax()) {
-                        throw $ex;
-                    } else {
-                        Flash::error($ex->getMessage());
-                    }
-                    
-                }
-            }
+            $pCountAuthor = $this->getPublicationAuthorCount($p);            
+            if ($pCountAuthor === 0) continue;
+            $p->countAuthor = $pCountAuthor;
 
-            if ($request['pub-list'] === 'list') {
-                $p->pk = $pk;
-                $p->countAuthor = $pCountAuthor;
-            }
+            try {
+                $pk = $p->k / $pCountAuthor;
+                $p->dividedK = $pk;
+            } catch (\DivisionByZeroError $er) {
+                throw new ApplicationException("Деление на 0 авторов. Публикация $p->id");
+            } 
 
             foreach ($p->publication_authors as $a) {
-
                 if (!$authors->contains('id', $a->id)) {
-                    $a->artWosTotal = 0;
-                    $a->artScopusTotal = 0;
-                    $a->artRiscTotal = 0;
-                    $a->procWosTotal = 0;
-                    $a->procScopusTotal = 0;
-                    $a->procRiscTotal = 0;
-                    $a->patentTotal = 0;
-                    $a->bookTotal = 0;
-                    // список всех премируемых авторов, 
-                    // включая тех кто не работает в научных подразделениях
+                    $a = $this->initAuthorSumsByPublicationTypes($a);
                     $authors[$a->id] = $a; 
                 }
 
@@ -207,36 +241,9 @@ class RaspilReport extends ComponentBase
                     continue;
                 }
 
-                switch ($p->publication_type_id) {
-                    case '1': // articles
-                        if ($p->is_wos) {
-                            $authors[$a->id]->artWosTotal += $pk;
-                        } elseif ($p->is_scopus) {
-                            $authors[$a->id]->artScopusTotal += $pk;
-                        } elseif ($p->is_risc) {
-                            $authors[$a->id]->artRiscTotal += $pk;
-                        }
-                        break;
-                    case '2': // inproceedings
-                        if ($p->is_wos) {
-                            $authors[$a->id]->procWosTotal += $pk;
-                        } elseif ($p->is_scopus) {
-                            $authors[$a->id]->procScopusTotal += $pk;
-                        } elseif ($p->is_risc) {
-                            $authors[$a->id]->procRiscTotal += $pk;
-                        }
-                        break;
-                    case '3': // patents
-                        $authors[$a->id]->patentTotal += $pk;
-                        break;
-                    case '4': // books
-                        $authors[$a->id]->bookTotal += $pk;
-                        break;
-                }
-
-            } // $p->publication_authors
-
-        } // foreach publications
+                $authors[$a->id] = $this->addDividedPublicationCoefficientToAuthor($p, $authors[$a->id]);
+            }
+        }
 
         if ($request['pub-list'] === 'list') {
             $this->publications = $publications->sortBy(function($row) {

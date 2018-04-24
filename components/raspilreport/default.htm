@@ -14,12 +14,22 @@
     </script>
 {% endput %}
 
+{% set nowYear = "now"|date('Y') %}
+
 <form class="ui form"
     data-request="{{ __SELF__ }}::onLoadReport"
     data-request-update="'{{ __SELF__ }}::raspil-list-by-departments': '#result'">
-    <div class="three wide field">
-        <label>Отчетный год</label>
-        <input name="year" type="number" value="2017" min="1990" max="2050">
+    <h4 class="ui dividing header">Общая информация</h4>    
+    <div class="fields">
+        <div class="field">
+            <label>Первый отчетный год</label>
+            <input name="year[from]" type="number" value="{{ nowYear - 1 }}" min="1990" max="{{ nowYear }}" tabindex="0">
+        </div>
+        <div class="field">
+            <label>Последний отчетный год</label>
+            <input name="year[to]" type="number" value="{{ nowYear }}" min="1990" max="{{ nowYear }}" tabindex="1">
+        </div>
+    
     </div>
     <div class="grouped fields">
         <label for="raspil-type">Способ деления</label>
@@ -125,7 +135,7 @@
     </div>
     <div class="field">
         <button type="submit" class="ui primary labeled icon button" data-attach-loading>
-            <i class="user icon"></i>Сформировать
+            <i class="book icon"></i>Сформировать
         </button> 
     </div>      
 </form>                    
