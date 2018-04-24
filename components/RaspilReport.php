@@ -123,7 +123,6 @@ class RaspilReport extends ComponentBase
         $author->artWosQ3Total = 0;
         $author->artWosQ4Total = 0;
         $author->artWosQ5Total = 0;
-        $author->artWosTotal = 0;
         $author->artScopusTotal = 0;
         $author->artRiscTotal = 0;
         $author->procWosTotal = 0;
@@ -139,8 +138,27 @@ class RaspilReport extends ComponentBase
         switch ($publication->publication_type_id) {
             case '1': // articles
                 if ($publication->is_wos) {
-                    // TODO Нужна логика по отдельным квартилям
-                    $author->artWosTotal += $publication->dividedK;
+                    if (!$publication->quartile) {
+                        $author->artWosQ5Total += $publication->dividedK;
+                    } else {
+                        switch ($publication->quartile) {
+                            case 'Q1':
+                                $author->artWosQ1Total += $publication->dividedK;
+                                break;
+                            case 'Q2':
+                                $author->artWosQ2Total += $publication->dividedK;
+                                break;
+                            case 'Q3':
+                                $author->artWosQ3Total += $publication->dividedK;   
+                                break;
+                            case 'Q4':
+                                $author->artWosQ4Total += $publication->dividedK;
+                                break;                
+                            case 'Q5':
+                                $author->artWosQ5Total += $publication->dividedK;
+                                break;                
+                        }                    
+                    }
                 } elseif ($publication->is_scopus) {
                     $author->artScopusTotal += $publication->dividedK;
                 } elseif ($publication->is_risc) {
@@ -258,7 +276,11 @@ class RaspilReport extends ComponentBase
                 continue;
             }            
             $a->total =
-                $a->artWosTotal +
+                $a->artWosQ1Total +
+                $a->artWosQ2Total +
+                $a->artWosQ3Total +
+                $a->artWosQ4Total +
+                $a->artWosQ5Total +
                 $a->artScopusTotal +
                 $a->artRiscTotal +
                 $a->procWosTotal +
