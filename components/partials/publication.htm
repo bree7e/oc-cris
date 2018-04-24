@@ -10,10 +10,10 @@
 {% if publication.publication_type_id == 1 or publication.publication_type_id == 2 %}
     <i>{{ publication.authors }}</i> {{ publication.title|trim }} // {{ publication.journal|trim }}. {{ publication.year|trim -}}
     {%- if publication.volume is not empty -%}
-        {{ volume ~ publication.volume|trim }}
-        {{ publication.number ? ", №" ~ publication.number|trim }}
+        {{- volume ~ publication.volume|trim -}}
+        {{- publication.number ? ", №" ~ publication.number|trim -}}
     {% elseif publication.number is not empty -%}
-        {{ ". — №" ~ publication.number|trim }}
+        {{- ". — №" ~ publication.number|trim -}}
     {%- endif %}
     {{- publication.pages ? pages ~ publication.pages|trim ~ "." -}}
     {{- publication.doi ? " DOI: " ~ publication.doi ~ "." -}}
@@ -25,5 +25,7 @@
 {% else %}
     <b>Нет шаблона вывода. Type ID: {{ publication.publication_type_id }} </b><i>{{ publication.authors }}</i> {{ publication.title|trim }}. {{ publication.year }}.
 {% endif %}
-        
+{% if showIndextion and publication.best_indexation != '-' %}
+    ({{ publication.best_indexation }})
+{% endif %}
     

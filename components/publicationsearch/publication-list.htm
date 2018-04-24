@@ -5,12 +5,12 @@
     
     {% for p in publications %}
         <li>
-          {% partial '@publication' publication = p %}
+          {% partial '@publication' publication = p showIndextion = true %}
         </li>        
     {% endfor %}
     <ol>
 {% else %}
-    <h2 class="ui  header">По вашему запросу не найдено публикаций!</h2>
+    <h2 class="ui  header">По вашему запросу не найдено публикаций</h2>
 {% endif %}
 
 
