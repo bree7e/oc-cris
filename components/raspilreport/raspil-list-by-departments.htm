@@ -6,14 +6,18 @@
         <thead>
             <tr >
                 <th rowspan="2" class="left aligned">Фамилия</th>
-                <th colspan="3">Статьи</th>
+                <th colspan="7">Статьи</th>
                 <th colspan="3">Труды конференций</th>
                 <th rowspan="2">Монографии</th>
                 <th rowspan="2">Свидетельства</th>
                 <th rowspan="2">ИТОГО</th>
             </tr>
             <tr>
-                <th>WoS</th>
+                <th>WoS Q1</th>
+                <th>WoS Q2</th>
+                <th>WoS Q3</th>
+                <th>WoS Q4</th>
+                <th>ESCI</th>
                 <th>Scopus</th>
                 <th>РИНЦ</th>
                 <th>Wos</th>
@@ -24,14 +28,18 @@
         <tbody>
             {% for department in departments %}
                 {% if department.workers %}
-                    <tr><th colspan="10">{{ department.name }}</th></tr>
+                    <tr><th colspan="14">{{ department.name }}</th></tr>
                     {% for author in department.workers %}
                     <tr data-user-id="{{ author.id }}">
                         <td class="left aligned">
                             {{ author.surname ~ " " ~ author.name|first ~ "." ~ author.middlename|first ~ "."}}
                             {{ author.hasExcepted ? " (Не учитывается)"}}
                         </td>
-                        <td>{{ author.artWosTotal ? author.artWosTotal|number_format(2)  }}</td>
+                        <td>{{ author.artWosQ1Total ? author.artWosQ1Total|number_format(2)  }}</td>
+                        <td>{{ author.artWosQ2Total ? author.artWosQ2Total|number_format(2)  }}</td>
+                        <td>{{ author.artWosQ3Total ? author.artWosQ3Total|number_format(2)  }}</td>
+                        <td>{{ author.artWosQ4Total ? author.artWosQ4Total|number_format(2)  }}</td>
+                        <td>{{ author.artWosQ5Total ? author.artWosQ5Total|number_format(2)  }}</td>
                         <td>{{ author.artScopusTotal ? author.artScopusTotal|number_format(2)  }}</td>
                         <td>{{ author.artRiscTotal ? author.artRiscTotal|number_format(2)  }}</td>
                         <td>{{ author.procWosTotal ? author.procWosTotal|number_format(2)  }}</td>
