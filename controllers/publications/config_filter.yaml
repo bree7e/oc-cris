@@ -4,9 +4,7 @@
 
 scopes:
     types:
-        # Filter name
         label: Тип публикации
-        # Model Class name
         modelClass: Bree7e\Cris\Models\PublicationType
         # Model attribute to display for the name
         nameFrom: name
@@ -33,15 +31,25 @@ scopes:
         type: group
         conditions: classification in (:filtered)   
         options: getClassificationOptions
+    indexation_type:
+        label: Индексация
+        type: group
+        scope: ofIndexationTypes
+        modelClass: Bree7e\Cris\Models\Publication
+        options:
+            wos: 'Wed of Science'
+            scopus: Scopus
+            risc: РИНЦ
+            vak: ВАК
     journal:
         label: Журнал (%)
         type: text
         conditions: journal like :value
         size: 30
-    is_editable:
+    editable:
         label: Редактируемые
         type: checkbox
-        conditions: is_editable <> true    
+        conditions: is_editable = true    
     authors:
         label: Привязано к автору
         modelClass: Bree7e\Cris\Models\Author

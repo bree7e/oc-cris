@@ -316,6 +316,34 @@ class Publication extends Model
     }
 
     /**
+     * Фильтрация публикаций по типам индексации
+     *
+     * @param Builder $query
+     * @param array $types wos | scopus | risc | vak
+     * @return Builder
+     */
+    public function scopeOfIndexationTypes(Builder $query, array $types): Builder
+    {
+        foreach ($types as $type) {
+            switch ($type) {
+                case 'wos':
+                    $query = $query->orWhere('is_wos', 1);
+                    break;
+                case 'scopus':
+                    $query = $query->orWhere('is_scopus', 1);
+                    break;
+                case 'risc':
+                    $query = $query->orWhere('is_risc', 1);
+                    break;
+                case 'vak':
+                    $query = $query->orWhere('is_vak', 1);
+                    break;
+            }
+        }
+        return $query;
+    }
+
+    /**
      * Фильтрация публикаций, индексируемых WoS
      *
      * @param Builder $query
@@ -346,6 +374,17 @@ class Publication extends Model
     public function scopeIsRisc(Builder $query): Builder
     {
         return $query->where('is_risc', 1);
+    }
+
+    /**
+     * Фильтрация публикаций, входящих в перечень ВАК
+     *
+     * @param Builder $query
+     * @return October\Rain\Database\Builder
+     */
+    public function scopeIsVak(Builder $query): Builder
+    {
+        return $query->where('is_vak', 1);
     }
 
     /**
