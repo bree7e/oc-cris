@@ -35,19 +35,19 @@
                             {{ author.surname ~ " " ~ author.name|first ~ "." ~ author.middlename|first ~ "."}}
                             {{ author.hasExcepted ? " (Не учитывается)"}}
                         </td>
-                        <td>{{ author.artWosQ1Total ? author.artWosQ1Total|number_format(2)  }}</td>
-                        <td>{{ author.artWosQ2Total ? author.artWosQ2Total|number_format(2)  }}</td>
-                        <td>{{ author.artWosQ3Total ? author.artWosQ3Total|number_format(2)  }}</td>
-                        <td>{{ author.artWosQ4Total ? author.artWosQ4Total|number_format(2)  }}</td>
-                        <td>{{ author.artWosQ5Total ? author.artWosQ5Total|number_format(2)  }}</td>
-                        <td>{{ author.artScopusTotal ? author.artScopusTotal|number_format(2)  }}</td>
-                        <td>{{ author.artRiscTotal ? author.artRiscTotal|number_format(2)  }}</td>
-                        <td>{{ author.procWosTotal ? author.procWosTotal|number_format(2)  }}</td>
-                        <td>{{ author.procScopusTotal ? author.procScopusTotal|number_format(2)  }}</td>
-                        <td>{{ author.procRiscTotal ? author.procRiscTotal|number_format(2)  }}</td>
-                        <td>{{ author.bookTotal ? author.bookTotal|number_format(2)  }}</td>
-                        <td>{{ author.patentTotal ? author.patentTotal|number_format(2)  }}</td>
-                        <td>{{ author.total ? author.total|number_format(2) : 0 }}</td>
+                        <td>{{ author.artWosQ1Total ? author.artWosQ1Total|number_format(2, ',')  }}</td>
+                        <td>{{ author.artWosQ2Total ? author.artWosQ2Total|number_format(2, ',')  }}</td>
+                        <td>{{ author.artWosQ3Total ? author.artWosQ3Total|number_format(2, ',')  }}</td>
+                        <td>{{ author.artWosQ4Total ? author.artWosQ4Total|number_format(2, ',')  }}</td>
+                        <td>{{ author.artWosQ5Total ? author.artWosQ5Total|number_format(2, ',')  }}</td>
+                        <td>{{ author.artScopusTotal ? author.artScopusTotal|number_format(2, ',')  }}</td>
+                        <td>{{ author.artRiscTotal ? author.artRiscTotal|number_format(2, ',')  }}</td>
+                        <td>{{ author.procWosTotal ? author.procWosTotal|number_format(2, ',')  }}</td>
+                        <td>{{ author.procScopusTotal ? author.procScopusTotal|number_format(2, ',')  }}</td>
+                        <td>{{ author.procRiscTotal ? author.procRiscTotal|number_format(2, ',')  }}</td>
+                        <td>{{ author.bookTotal ? author.bookTotal|number_format(2, ',')  }}</td>
+                        <td>{{ author.patentTotal ? author.patentTotal|number_format(2, ',')  }}</td>
+                        <td>{{ author.total ? author.total|number_format(2, ',') : 0 }}</td>
                     </tr>             
                     {% endfor %}
                 {% endif %}
@@ -63,7 +63,7 @@
     <ul class="ui list">
         {% for p in publications %}
         <li>
-            {{ p.k|number_format(2) ~ "/" ~ p.countAuthor ~ "=" ~ p.dividedK|number_format(2) }} <strong>{{ p.authors }}</strong> - {{ p.title }}. {{ p.year }}
+            {{ p.k|number_format(2, ',') ~ "/" ~ p.countAuthor ~ "=" ~ p.dividedK|number_format(2, ',') }} <strong>{{ p.authors }}</strong> - {{ p.title }}. {{ p.year }}
             {% if p.hasTranslatedVersion %}
                  <span style="color: orange;">(Есть перевод:
                     {{ p.translated_version.authors ~ " " ~ p.translated_version.title ~ "." ~ p.translated_version.year ~ "." }}
