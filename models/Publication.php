@@ -104,6 +104,40 @@ class Publication extends Model
     public $attachMany = [];
 
     /**
+     * Сохранение нужной классификации по типу публикации
+     * Вручную классификация проставляется только для Трудов конференций
+     */
+    public function beforeSave()
+    {   
+        switch ($this->publication_type_id) {
+            case '1': // articles
+                if ($this->type == 'Электронный ресурс') {
+                    $this->classification = 'Электронные публикации';
+                    break;
+                }
+                if ($this->language === 'russian') {
+                    $this->classification = 'Статьи в российских журналах';
+                } else {
+                    $this->classification = 'Статьи в зарубежных и переводных журналах';
+                }
+                break;
+            case '2': // inproceedings
+                // ставится вручную
+                break;
+            case '3': // patents
+                $this->classification = 'Свидетельства о государственной регистрации объектов интеллектуальной собственности';
+                break;
+            case '4': // books
+            case '5': // inbooks
+                $this->classification = 'Монографии и главы в монографиях';
+                break;
+            case '6': // phdthesis
+                $this->classification = 'Диссертации';
+                break;
+        }
+    }
+
+    /**
      * Наивысшая индексация. WoS по квартилям >  Scopus > РИНЦ
      *
      * @return void
