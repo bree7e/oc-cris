@@ -1,40 +1,10 @@
 <?php namespace Bree7e\Cris\Models;
 
 use Bree7e\Cris\Models\Department;
-use AuthorAlternativeName as Synonym;
+use Bree7e\Cris\Models\AuthorAlternativeName as Synonym;
 use October\Rain\Auth\Models\User as UserModel;
 use October\Rain\Database\Collection;
-
-// TODO поискать как в октябре делают слаги
-
-function ru2Lat($string, $gost = false)
-{
-    if ($gost) {
-        $replace = array("А" => "A", "а" => "a", "Б" => "B", "б" => "b", "В" => "V", "в" => "v", "Г" => "G", "г" => "g", "Д" => "D", "д" => "d",
-            "Е" => "E", "е" => "e", "Ё" => "E", "ё" => "e", "Ж" => "Zh", "ж" => "zh", "З" => "Z", "з" => "z", "И" => "I", "и" => "i",
-            "Й" => "I", "й" => "i", "К" => "K", "к" => "k", "Л" => "L", "л" => "l", "М" => "M", "м" => "m", "Н" => "N", "н" => "n", "О" => "O", "о" => "o",
-            "П" => "P", "п" => "p", "Р" => "R", "р" => "r", "С" => "S", "с" => "s", "Т" => "T", "т" => "t", "У" => "U", "у" => "u", "Ф" => "F", "ф" => "f",
-            "Х" => "Kh", "х" => "kh", "Ц" => "Tc", "ц" => "tc", "Ч" => "Ch", "ч" => "ch", "Ш" => "Sh", "ш" => "sh", "Щ" => "Shch", "щ" => "shch",
-            "Ы" => "Y", "ы" => "y", "Э" => "E", "э" => "e", "Ю" => "Iu", "ю" => "iu", "Я" => "Ia", "я" => "ia", "ъ" => "", "ь" => "");
-    } else {
-        $arStrES = array("ае", "уе", "ое", "ые", "ие", "эе", "яе", "юе", "ёе", "ее", "ье", "ъе", "ый", "ий");
-        $arStrOS = array("аё", "уё", "оё", "ыё", "иё", "эё", "яё", "юё", "ёё", "её", "ьё", "ъё", "ый", "ий");
-        $arStrRS = array("а$", "у$", "о$", "ы$", "и$", "э$", "я$", "ю$", "ё$", "е$", "ь$", "ъ$", "@", "@");
-
-        $replace = array("А" => "A", "а" => "a", "Б" => "B", "б" => "b", "В" => "V", "в" => "v", "Г" => "G", "г" => "g", "Д" => "D", "д" => "d",
-            "Е" => "Ye", "е" => "e", "Ё" => "Ye", "ё" => "e", "Ж" => "Zh", "ж" => "zh", "З" => "Z", "з" => "z", "И" => "I", "и" => "i",
-            "Й" => "Y", "й" => "y", "К" => "K", "к" => "k", "Л" => "L", "л" => "l", "М" => "M", "м" => "m", "Н" => "N", "н" => "n",
-            "О" => "O", "о" => "o", "П" => "P", "п" => "p", "Р" => "R", "р" => "r", "С" => "S", "с" => "s", "Т" => "T", "т" => "t",
-            "У" => "U", "у" => "u", "Ф" => "F", "ф" => "f", "Х" => "Kh", "х" => "kh", "Ц" => "Ts", "ц" => "ts", "Ч" => "Ch", "ч" => "ch",
-            "Ш" => "Sh", "ш" => "sh", "Щ" => "Sh", "щ" => "sh", "Ъ" => "", "ъ" => "", "Ы" => "Y", "ы" => "y", "Ь" => "", "ь" => "",
-            "Э" => "E", "э" => "e", "Ю" => "Yu", "ю" => "yu", "Я" => "Ya", "я" => "ya", "@" => "y", "$" => "ye");
-
-        $string = str_replace($arStrES, $arStrRS, $string);
-        $string = str_replace($arStrOS, $arStrRS, $string);
-    }
-
-    return iconv("UTF-8", "UTF-8//IGNORE", strtr($string, $replace));
-}
+use October\Rain\Support\Str;
 
 /**
  * Author Model
@@ -153,9 +123,9 @@ class Author extends UserModel
         // main english synonym
         $synonym = new Synonym();
         // $synonym->author()->associate($this); // $synonym->rb_author_id = $this->getKey();
-        $synonym->lastname = ru2Lat($this->surname);
-        $synonym->firstname = mb_substr(ru2Lat($this->name), 0, 1, "UTF-8") . ".";
-        $synonym->middlename = mb_substr(ru2Lat($this->middlename), 0, 1, "UTF-8") . ".";
+        $synonym->lastname = Str::ascii($this->surname);
+        $synonym->firstname = mb_substr(Str::ascii($this->name), 0, 1, "UTF-8") . ".";
+        $synonym->middlename = mb_substr(Str::ascii($this->middlename), 0, 1, "UTF-8") . ".";
         $this->synonyms()->save($synonym);
 
     }
