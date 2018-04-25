@@ -6,8 +6,10 @@
             <tr>
                 <th><span>№</span></th>
                 <th><span>Авторы</span></th>
-                <th><span>Название</span></th>
+                <th style="width: 20%;"><span>Название</span></th>
                 <th><span>Журнал</span></th>
+                <th><span>Адрес</span></th>
+                <th><span>Издательство</span></th>
                 <th><span>Год</span></th>
                 <th><span>Том</span></th>
                 <th><span>Номер</span></th>
@@ -21,13 +23,15 @@
         <?php foreach ($publications as $key => $p): ?>
             <tr data-id="<?= $p[1] ?>">
                 <td><?= $p[1] ?></td>
-                <td><input type="text" name="publications[<?= $key ?>][authors]" value="<?= $p['authors'] ?>" class="form-control" /></td>
-                <td><input type="text" name="publications[<?= $key ?>][title]"   value="<?= $p['title'] ?>" class="form-control" /></td>
-                <td><input type="text" name="publications[<?= $key ?>][journal]" value="<?= $p['journal'] ?>" class="form-control" /></td>
-                <td><input type="text" name="publications[<?= $key ?>][year]"    value="<?= $p['year'] ?>" class="form-control" /></td>
-                <td><input type="text" name="publications[<?= $key ?>][volume]"  value="<?= $p['volume'] ?>" class="form-control" /></td>
-                <td><input type="text" name="publications[<?= $key ?>][number]"  value="<?= $p['number'] ?>" class="form-control" /></td>
-                <td><input type="text" name="publications[<?= $key ?>][pages]"   value="<?= $p['pages'] ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][authors]"    value="<?= $p['authors'] ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][title]"      value="<?= $p['title'] ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][journal]"    value="<?= $p['journal'] ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][address]"    value="<?= isset($p['address']) ? $p['address'] : '' ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][publisher]"  value="<?= isset($p['publisher']) ? $p['publisher'] : '' ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][year]"       value="<?= $p['year'] ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][volume]"     value="<?= isset($p['volume']) ? $p['volume'] : '' ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][number]"     value="<?= isset($p['number']) ? $p['number'] : '' ?>" class="form-control" /></td>
+                <td><input type="text" name="publications[<?= $key ?>][pages]"      value="<?= isset($p['pages']) ? $p['pages'] : '' ?>" class="form-control" /></td>
                 <td class="list-checkbox nolink">
                     <div class="checkbox custom-checkbox nolabel">
                         <input id="wos-<?= $key ?>" type="checkbox" name="publications[<?= $key ?>][is_wos]" <?php if (isset($p['index']) && $p['index'] === 'WoS') echo 'checked'; ?> />

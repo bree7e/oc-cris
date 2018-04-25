@@ -82,28 +82,47 @@ class Publications extends Controller
 
     public function onRecognize() 
     {
-        $import = Request::input('import');
+        $import = input('import');
 
-        if ($import['publication_type_id'] != '1') {
-            throw new ApplicationException('Неподдерживаемый тип публикации');
-        }
-
-        switch ($import['language']) {
-            case 'russian':
-                $pattern = '/([0-9]+\.)\s\t?((?:[а-яёА-Я\-]+\s?[А-Я]{1}\.\s?[А-Я]{1}\.,?\s)+)(.*)\s\/\/\s([\S ]*)(\d{4})[\.,]\s(?:Т\.\s(\d+))?[\.,]?\s?(?:№\s?([\d\(\)\- )]+)[\.,])?\s?[cCсС]\.\s?(\d+(?:[-–]\d+)?)/u';
-                $pattern = '/([0-9]+\.)?\s\t?(?<authors>(?:[а-яёА-Я\-]+\s?[А-Я]{1}\.\s?[А-Я]{1}\.,?\s)+)(?<title>.*)\s\/\/\s(?<journal>[\S ]*)(?<year>\d{4})[\.,]\s(?:Т\.\s(?<volume>\d+))?[\.,]?\s?(?:№\s?(?<number>[\d\(\)\- )]+)[\.,])?\s?[cCсС]\.\s?(?<pages>\d+(?:[-–]\d+)?)(?:.*?\((?<index>.*)\))?/u';
+        switch ($import['publication_type_id']) {
+            case '1': // articles
+                switch ($import['language']) {
+                    case 'russian':
+                        $pattern = '/([0-9]+\.)\s\t?((?:[а-яёА-Я\-]+\s?[А-Я]{1}\.\s?[А-Я]{1}\.,?\s)+)(.*)\s\/\/\s([\S ]*)(\d{4})[\.,]\s(?:Т\.\s(\d+))?[\.,]?\s?(?:№\s?([\d\(\)\- )]+)[\.,])?\s?[cCсС]\.\s?(\d+(?:[-–]\d+)?)/u';
+                        $pattern = '/([0-9]+\.)?\s\t?(?<authors>(?:[а-яёА-Я\-]+\s?[А-Я]{1}\.\s?[А-Я]{1}\.,?\s)+)(?<title>.*)\s\/\/\s(?<journal>[\S ]*)(?<year>\d{4})[\.,]\s(?:Т\.\s(?<volume>\d+))?[\.,]?\s?(?:№\s?(?<number>[\d\(\)\- )]+)[\.,])?\s?[cCсС]\.\s?(?<pages>\d+(?:[-–]\d+)?)(?:.*?\((?<index>.*)\))?/u';
+                        break;
+                    
+                    case 'english':
+                        $pattern = '/([0-9]+\.)\s\t?((?:[a-zA-Zа-яёА-Я\-]+\s?([A-ZА-Я]{1}\.)?\s?[A-ZА-Я]{1}\.,?\s)+)(.*)\s\/\/\s([\S ]*)(\d{4})[\.,]\s(?:[Т|Vol]\.\s(\d+))?[\.,]?\s?(?:[№|No]\s?([\d\(\)\- )]+)[\.,])?\s?[cCсС]|[p]\.\s?(\d+(?:[-–]\d+)?)/u';
+                        $pattern = '/([0-9]+\.)\s\t?(?<authors>(?:[a-zA-Zа-яёА-Я\-]+\s?(?:[A-ZА-Я]{1}\.)?\s?[A-ZА-Я]{1}\.,?\s)+)(?<title>.*)\s\/\/\s(?<journal>[\S ]*)(?<year>\d{4})[\.,]\s?(?:(?:Vol|[TТт])\.\s(?<volume>\d+))?[\.,]?\s?(?:(?:No\.|№)\s?(?<number>[\d\(\)\- )]+)[\.,])?\s?[рРpPCcСс]{1,2}\.\s?(?<pages>\d+(?:[-–]\d+)?)(?:.*?\((?<index>.*)\))?/u';
+                        break;
+                    
+                    default:
+                        throw new ApplicationException('Неподдерживаемый язык статей');
+                        break;
+                }
                 break;
             
-            case 'english':
-                $pattern = '/([0-9]+\.)\s\t?((?:[a-zA-Zа-яёА-Я\-]+\s?([A-ZА-Я]{1}\.)?\s?[A-ZА-Я]{1}\.,?\s)+)(.*)\s\/\/\s([\S ]*)(\d{4})[\.,]\s(?:[Т|Vol]\.\s(\d+))?[\.,]?\s?(?:[№|No]\s?([\d\(\)\- )]+)[\.,])?\s?[cCсС]|[p]\.\s?(\d+(?:[-–]\d+)?)/u';
-                $pattern = '/([0-9]+\.)\s\t?(?<authors>(?:[a-zA-Zа-яёА-Я\-]+\s?(?:[A-ZА-Я]{1}\.)?\s?[A-ZА-Я]{1}\.,?\s)+)(?<title>.*)\s\/\/\s(?<journal>[\S ]*)(?<year>\d{4})[\.,]\s?(?:(?:Vol|[TТт])\.\s(?<volume>\d+))?[\.,]?\s?(?:(?:No\.|№)\s?(?<number>[\d\(\)\- )]+)[\.,])?\s?[рРpPCcСс]{1,2}\.\s?(?<pages>\d+(?:[-–]\d+)?)(?:.*?\((?<index>.*)\))?/u';
+            case '2': // inproceedings
+                switch ($import['language']) {
+                    case 'russian':
+                        $pattern = '/([0-9]+\.)?\s\t?(?<authors>(?:[а-яёА-Я\-]+\s?[А-Я]{1}\.\s?[А-Я]{1}\.,?\s)+)(?<title>.*)\s\/\/\s(?<journal>[\S ]*)(?:\.\s(?<address>[\S ]*))(?<year>\d{4})[\.,]\s(?:Т\.\s(?<volume>\d+))?[\.,]?\s?(?:№\s?(?<number>[\d\(\)\- )]+)[\.,])?\s?[cCсС]\.\s?(?<pages>\d+(?:[-–]\d+)?)(?:.*?\((?<index>.*)\))?/u';                        
+                    break;
+
+                    case 'english':
+                        $pattern = '/([0-9]+\.)\s\t?(?<authors>(?:[a-zA-Zа-яёА-Я\-]+\s?(?:[A-ZА-Я]{1}\.)?\s?[A-ZА-Я]{1}\.,?\s)+)(?<title>.*)\s\/\/\s(?<journal>[\S ]*)\.\s(?<address>[\S ]*)?(?:\:\s(?<publisher>[\S ]*))?(?<year>\d{4})[\.,]\s?(?:(?:Vol|[TТт])\.\s(?<volume>\d+))?[\.,]?\s?(?:(?:No\.|№|Issue)\s?(?<number>[\d\(\)\- )]+)[\.,])?\s?(?:[рРpPCcСс]{1,2}\.\s?(?<pages>\d+(?:[-–]\d+)?))?(?:.*\s?(?<doi>10\.\d{3,5}\/.*))?(?:.*?\((?<index>.*)\))?/u';
+                    break;
+
+                    default:
+                        throw new ApplicationException('Неподдерживаемый язык материалов конференций');
+                        break;
+                }
                 break;
-            
+
             default:
-                throw new ApplicationException('Неподдерживаемый язык публикации');
+                throw new ApplicationException('Неподдерживаемый тип публикации');
                 break;
-        }
-        
+        }      
 
         $text = $import['text'];
 
@@ -118,9 +137,18 @@ class Publications extends Controller
             $this->vars['classification'] = $import['classification'];
             $this->vars['reportYear'] = $import['reportYear'];
 
-            return [
-                'partialContents' => $this->makePartial('import_list')
-            ];    
+            switch ($import['publication_type_id']) {
+                case '1': // articles
+                    return [
+                        '#result' => $this->makePartial('import_list')
+                    ];    
+                    break;
+                case '2': // inproceedings
+                    return [
+                        '#result' => $this->makePartial('import_list_proc')
+                    ];    
+                break;
+            }
         } else {
             return Flash::error('Публикации не распознаны');
         }
