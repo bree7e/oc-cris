@@ -22,7 +22,7 @@ fields:
         trigger:
             action: show
             field: publicationtype
-            condition: 'value[2]'
+            condition: 'value[1][2]'
     reportYear:
         label: 'Отчетный год'
         span: auto
@@ -66,7 +66,7 @@ fields:
     title:
         label: Название
         span: full
-        default: 'Информационная система'
+        default: ''
         required: 1
         type: text
     journal:

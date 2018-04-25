@@ -227,5 +227,50 @@ class Problems extends Controller
         }
         
         return $this->listRefresh();  
+    }   
+
+    /**
+     * AJAX функция для установки классификации исходя из типа и языка публикации
+     *
+     * @return void
+     */
+    public function index_onSetCorrectClassification()
+    {
+        $publications = Publication::all();
+        $count = 0;
+        
+        foreach ($publications as $p) {
+            if ($p->classification !== 'Монографии и главы в монографиях') continue;
+            switch ($p->publication_type_id) {
+                case '1': // articles
+                    if ($p->type == 'Электронный ресурс') {
+                        $p->classification = 'Электронные публикации';
+                        break;
+                    }
+                    if ($p->language === 'russian') {
+                        $p->classification = 'Статьи в российских журналах';
+                    } else {
+                        $p->classification = 'Статьи в зарубежных и переводных журналах';
+                    }
+                    break;
+                case '2': // inproceedings
+                    // ставится вручную
+                    break;
+                case '3': // patents
+                    $p->classification = 'Свидетельства о государственной регистрации объектов интеллектуальной собственности';
+                    break;
+                case '4': // books
+                case '5': // inbooks
+                    $p->classification = 'Монографии и главы в монографиях';
+                    break;
+                case '6': // phdthesis
+                    $p->classification = 'Диссертации';
+                    break;
+            }            
+            $count++;
+            $p->save();
+        }
+
+        Flash::success("Для ($count) публикации(-ий)  проставлена классификация"); 
     }    
 }
