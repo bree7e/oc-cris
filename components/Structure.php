@@ -5,6 +5,7 @@ use Cms\Classes\ComponentBase;
 use Bree7e\Cris\Models\Author;
 use Bree7e\Cris\Models\Department;
 use Bree7e\Cris\Models\Publication;
+use October\Rain\Database\TreeCollection;
 
 class Structure extends ComponentBase
 {
@@ -46,16 +47,39 @@ class Structure extends ComponentBase
         $profilePage = $this->property('profilePage');        
     }
 
+    /**
+     * Проставляет веса каждому автору подразделения в поле 
+     * positionSum исходя из суммы весов его должностей
+     *
+     * @param TreeCollection|Department $d
+     * @return void
+     */
+    private function setAuthorWeight($department)
+    {
+        if ($department instanceOf TreeCollection) { // root
+            $department->each(function ($d) {
+                $this->setAuthorWeight($d);
+            });
+        } 
+        
+        if ($department instanceOf Department) {
+            if ($department->getChildCount() > 0) {
+                // $childrens = $department->siblings()->with('authors')->with('positions')->get();
+                $department->getChildren()->each(function ($d) {
+                    $this->setAuthorWeight($d);
+                });
+            } elseif ($department->authors->count() > 0) $department->authors->each(function ($a) {
+                $a->positionSum = $a->positions->pluck('sort_order')->sum();
+            });    
+        }
+            // if ($d instanceOf Department) {
+    }
+
     public function getDepartments() 
     {
         $departments = Department::siblings()->with('authors')->with('positions')->get();
 
-        array_walk_recursive($departments, function ($d) {
-            $a = 1;
-            if ($d->authors) $d->authors->each(function ($a) {
-                $a->positionSum = $a->positions->pluck('sort_order')->sum();
-            });            
-        });
+        $this->setAuthorWeight($departments);
 
         array_walk_recursive($departments, function ($d) {
             if ($d->authors) {
