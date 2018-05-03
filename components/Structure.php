@@ -64,15 +64,16 @@ class Structure extends ComponentBase
         
         if ($department instanceOf Department) {
             if ($department->getChildCount() > 0) {
-                // $childrens = $department->siblings()->with('authors')->with('positions')->get();
                 $department->getChildren()->each(function ($d) {
                     $this->setAuthorWeight($d);
                 });
-            } elseif ($department->authors->count() > 0) $department->authors->each(function ($a) {
-                $a->positionSum = $a->positions->pluck('sort_order')->sum();
-            });    
+            } elseif ($department->authors->count() > 0) {
+                $department->authors->each(function ($a) {
+                    $a->positionSum = $a->positions->pluck('sort_order')->sum();
+                });    
+                $department->sortedAuthors = $department->authors->sortBy('positionSum');
+            }
         }
-            // if ($d instanceOf Department) {
     }
 
     public function getDepartments() 
@@ -80,20 +81,6 @@ class Structure extends ComponentBase
         $departments = Department::siblings()->with('authors')->with('positions')->get();
 
         $this->setAuthorWeight($departments);
-
-        array_walk_recursive($departments, function ($d) {
-            if ($d->authors) {
-                // $d->authors = $d->authors->sortBy('positionSum');            
-            }
-        });
-        // высчитать сумму веса сотрудника по его должностям в поле positionSum
-        // нужно сделать это рекурсивно
-        // foreach ($departments as $department) {
-        //     $department->authors->each(function ($item, $key) {
-        //         $item->positionSum = $item->positions->pluck('sort_order')->sum();
-        //     });
-        //     $b = $department->authors;
-        // }
 
         // foreach ($departments as $department) {
         //     $department->authors = $department->authors->sortBy('positionSum');
