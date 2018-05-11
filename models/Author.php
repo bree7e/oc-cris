@@ -22,12 +22,10 @@ class Author extends UserModel
         ],
     ];
 
-    public $attachOne = [
-        'avatar' => ['System\Models\File'],
-    ];
-
-
     public function __construct() {
+
+        parent::__construct();
+        
         /**
          * The attributes that should be mutated to dates.
          *
@@ -77,11 +75,9 @@ class Author extends UserModel
                 'key' => 'rb_consultant_id',
             ],
         ]);    
-        
-        parent::__construct();
-    
+            
     }
-
+    
     /**
      * Фильтрация авторов определенного подразделения
      *

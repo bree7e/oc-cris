@@ -7,9 +7,11 @@ use Bree7e\Cris\Models\Publication;
 use Cms\Classes\ComponentBase;
 use Cms\Classes\Page;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use October\Rain\Argon\Argon;
+use RainLab\User\Models\User;
 
 class Authors extends ComponentBase
-{
+{   
     /**
      * @var Bree7e\Cris\Models\Author Автор
      */
@@ -97,25 +99,19 @@ class Authors extends ComponentBase
             return $this->controller->run('404');
         }
 
+        // наследуемая модель не может получить доступ к attachOne родителя
+        $user = User::findOrFail($id);
+        $author->avatar = $user->avatar;
+
         $publications = Publication::ofAuthors([$id])->orderBy('year', 'desc')->get();
         $author->publicationCount = $publications->count();
-
-        $publicationsGroupedByYear = [];
-        foreach ($publications as $p) {
-            $publicationsGroupedByYear[$p->year][] = $p;
-        }
+        $publicationsGroupedByYear = $publications->groupBy('year');
 
         $projects = Project::ofLeader($author)->orderBy('start_year_date', 'desc')->get();
         $author->projectCount = $projects->count();
-
-        $projectsGroupedByYear = [];
-        foreach ($projects as $p) {
-            if ($p->start_year) {
-                $projectsGroupedByYear[$p->start_year][] = $p;
-            } else {
-                $projectsGroupedByYear['Неизвестно'][] = $p;
-            }
-        }
+        $projectsGroupedByYear = $projects->groupBy(function($p) {
+            return Argon::parse($p->start_year_date)->format('Y');
+        });
 
         $this->author = $author;
         $this->publications = $publicationsGroupedByYear;

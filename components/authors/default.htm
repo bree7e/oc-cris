@@ -6,13 +6,11 @@
 {% set projectPage = __SELF__.projectPage %}
 
 <h1 class="ui header">{{ author.surname ~ ' ' ~ author.name ~ ' ' ~ author.middlename}}</h1>
-
 <div class="ui clearing vertical segment">
     {% if author.avatar %}
-        <img class="ui rounded bordered floated image" src="{{ url('/')}}{{ author.avatar.thumb(150, 200) }}">
+        <img class="ui rounded bordered floated image" src="{{ author.avatar.thumb(200, 200) }}">
     {% else %}
         <img class="ui rounded bordered floated image" src="{{ '/plugins/bree7e/cris/assets/images/man.png'|app }}" width="200px">
-        
     {% endif %}
     {# <p>Кандидат технических наук</p>
     <p>Тема кадидатской диссерации: <i>Тема из базы данных</i></p> #}
@@ -66,7 +64,6 @@
         {% endfor %}
         </div>    
     {% endfor %}
-    </div>
 </div>
 {% endif %}
 
@@ -79,7 +76,7 @@
         {% for project in projects %}
             <div class="item">
                 <div class="content">
-                    <div><a href="{{ projectPage|page({id: ' '}) ~ '/' ~ project.id }}">Проект {{ project.project_number }}</a> {{ project.name }}
+                    <div><a href="{{ projectPage|page({id: ' '}) ~ '/' ~ project.id }}">{{ project.project_number }}</a> {{ project.name }}
                         <!-- Нужен switch для типов публикаций -->
                         {% if project.project_type_id == 1 %}
                         <div class="ui green mini label">{{ project.projecttype.name }}</div>
@@ -96,9 +93,6 @@
                         {% elseif project.project_type_id == 6 %}
                         <div class="ui black mini label">{{ project.projecttype.name }}</div>
                         {% endif %}                        
-                    </div>
-                    <div class="description">
-                        <p>{{ project.description }}</p>
                     </div>
                 </div>
             </div>

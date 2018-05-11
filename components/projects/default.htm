@@ -2,17 +2,16 @@
 {% set project = __SELF__.project %}
 {% set publications = project.publications %}
 
-{# Пубилкация{{project}} #}
 <h1 class="ui header">{{ project.name }}</h1>
-<p>Руководитель: {{ project.leader.surname }} {{project.leader.name}}</p>
+<p>Руководитель: {{ project.leader.surname }} {{ project.leader.name }} {{ project.leader.middlename }}</p>
 <p>Тип проекта: {{ project.projecttype.name }}</p>
 <p>Конкурс: {{ project.competition }}</p>
 <p>Номер: {{ project.project_number }}<br/>
 Номер ЦИТИС: {{ project.nioktr_number }}</p>
-<p>Год начала: {{ project.start_year }}<br/>
-Год завершения: {{ project.finish_year }}</p>
+<p>Дата начала: {{ project.start_year_date }}<br/>
+Дата завершения: {{ project.finish_year_date }}</p>
 <p>URL: {{ project.url }}</p>
-<p>Описание: {{ project.description }}</p>
+<p>Описание: {{ project.description|raw }}</p>
 
 {% if publications|length > 0 %}
 <h3 class="ui header">Публикации по проекту:</h3>
