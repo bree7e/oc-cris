@@ -27,7 +27,7 @@ class Plugin extends PluginBase
     public function pluginDetails()
     {
         return [
-            'name'        => 'Current Research Information System',
+            'name'        => 'CRIS',
             'description' => 'Система учёта публикаций',
             'author'      => 'Alexandr Vetrov',
             'icon'        => 'icon-leaf'
@@ -73,16 +73,7 @@ class Plugin extends PluginBase
     public function registerComponents()
     {
         return [
-            Components\RaspilReport::class      => 'crisReport', 
-            Components\YearReport::class        => 'yearReport', 
-            Components\Report33::class          => 'report33', 
-            Components\PublicationForm::class   => 'publicationForm',
             Components\PublicationSearch::class => 'publicationSearch',
-            Components\AddAuthorsForm::class    => 'addAuthorsForm',
-            Components\MyPublications::class    => 'myPublications',
-            Components\Phones::class            => 'phones',
-            Components\Statistics::class        => 'statistics',
-            Components\Structure::class         => 'structure',
             Components\Publications::class      => 'publications',
             Components\PublicationList::class   => 'publicationList',
             Components\Projects::class          => 'projects',
